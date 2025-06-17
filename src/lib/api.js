@@ -12,3 +12,13 @@ export const fetchTodoById = async (id) => { //fetch specific todo item
   if (!res.ok) throw new Error('Failed to fetch todo')
   return res.json()
 }
+
+export const createTodo = async (todo) => { //Create todo
+  const res = await fetch(`${BASE_URL}/todos`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(todo),
+  })
+  if (!res.ok) throw new Error('Failed to create todo')
+  return res.json()
+}

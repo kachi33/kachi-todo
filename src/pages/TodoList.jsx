@@ -4,6 +4,8 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 import { fetchTodos } from "@/lib/api";
 import PaginationControl from "@/components/PaginationControl";
 import { useQuery } from "@tanstack/react-query";
+import CreateTodo from "@/components/CreateTodo";
+
 
 function TodoList() {
   const {
@@ -14,6 +16,13 @@ function TodoList() {
     queryKey: ["todos"],
     queryFn: fetchTodos,
   });
+
+    const [localTodos, setLocalTodos] = useState([]);
+
+  const handleCreate = (newTodo) => {
+    setLocalTodos((prev) => [newTodo, ...prev]);
+  };
+
 
   const [currentPage, setCurrentPage] = useState(1);
   const todosPerPage = 10;
@@ -45,7 +54,13 @@ function TodoList() {
 
   return (
     <main className="md:p-4 max-h-[100vh] bg-stone-200">
+              <div className="flex justify-between items-center p-4">
+
       <h1 className="md:text-2xl text- xl font-bold">Kachi's Todo List</h1>
+      
+      <CreateTodo onCreate={handleCreate} />
+
+      </div>
       <ScrollArea className="h-[80vh] rounded-md p-4 ">
         <ul className="space-y-2">
           {paginatedTodos.map((todo) => (

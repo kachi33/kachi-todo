@@ -13,8 +13,8 @@ function TodoListItem({ todo, onEdit, onDelete }) {
         <span
           className={`text-xs px-2 py-1 rounded mx-2 ${
             todo.completed
-              ? "bg-green-200 text-green-800"
-              : "bg-yellow-200 text-yellow-800"
+              ? "bg-green-100 text-green-800"
+              : "bg-yellow-100 text-yellow-800"
           }`}
         >
           {todo.completed ? "Completed" : "Incomplete"}
@@ -22,7 +22,7 @@ function TodoListItem({ todo, onEdit, onDelete }) {
         <Separator orientation="vertical" />
 
         <div className="flex flex-col md:flex-row md:gap-1">
-          <Button onClick={() => onEdit(todo)}>Edit</Button>
+          <Button variant="ghost" onClick={() => onEdit(todo)}>Edit</Button>
 
           <Button variant="destructive" onClick={() => onDelete(todo)}>
             Delete
