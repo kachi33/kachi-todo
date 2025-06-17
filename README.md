@@ -104,11 +104,7 @@ Some features (e.g., completion toggle) are not editable in the UI
 
 📱 Improve mobile layout and responsiveness
 
-🔒 Add authentication (Auth0, Clerk, Firebase)
-
 📴 Enable offline mode with service workers
-
-📊 Add analytics for completed/incomplete todos
 
 ## 🤝 Contributing
 Contributions are welcome! To get started:
