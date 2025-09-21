@@ -12,16 +12,16 @@ import {
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { createTodo } from "@/lib/api"; 
+import { createTodo } from "@/lib/api";
 import { CirclePlus } from 'lucide-react';
+import { CreateTodoProps } from "@/types";
 
+function CreateTodo({ onCreate }: CreateTodoProps): React.JSX.Element {
+  const [title, setTitle] = useState<string>("");
+  const [isLoading, setIsLoading] = useState<boolean>(false);
+  const [error, setError] = useState<string | null>(null);
 
-function CreateTodo({ onCreate }) {
-  const [title, setTitle] = useState("");
-  const [isLoading, setIsLoading] = useState(false);
-  const [error, setError] = useState(null);
-
-  const handleSubmit = async (e) => {
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>): Promise<void> => {
     e.preventDefault();
     if (!title.trim()) return;
 
@@ -33,7 +33,7 @@ function CreateTodo({ onCreate }) {
       setTitle("");
       onCreate && onCreate(newTodo); // Notify parent about new todo
     } catch (err) {
-      setError(err.message || "Failed to create todo");
+      setError(err instanceof Error ? err.message : "Failed to create todo");
     } finally {
       setIsLoading(false);
     }

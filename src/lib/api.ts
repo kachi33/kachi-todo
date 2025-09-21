@@ -1,19 +1,21 @@
-const BASE_URL = 'https://jsonplaceholder.typicode.com' 
+import { Todo, CreateTodoData } from '@/types';
+
+const BASE_URL = 'https://jsonplaceholder.typicode.com';
 
 // === Todos Methods ===
-export const fetchTodos = async () => { // get all todos
+export const fetchTodos = async (): Promise<Todo[]> => { // get all todos
   const res = await fetch(`${BASE_URL}/todos`)
   if (!res.ok) throw new Error('Failed to fetch todos')
   return res.json()
 }
 
-export const fetchTodoById = async (id) => { //fetch specific todo item
+export const fetchTodoById = async (id: string | number): Promise<Todo> => { //fetch specific todo item
   const res = await fetch(`${BASE_URL}/todos/${id}`)
   if (!res.ok) throw new Error('Failed to fetch todo')
   return res.json()
 }
 
-export const createTodo = async (todo) => { //Create todo
+export const createTodo = async (todo: CreateTodoData): Promise<Todo> => { //Create todo
   const res = await fetch(`${BASE_URL}/todos`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },

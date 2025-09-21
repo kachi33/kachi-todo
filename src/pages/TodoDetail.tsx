@@ -4,8 +4,8 @@ import { useParams, useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { ArrowLeft } from "lucide-react";
 
-function TodoDetail() {
-  const { id } = useParams();
+function TodoDetail(): React.JSX.Element {
+  const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
 
   const {
@@ -14,12 +14,15 @@ function TodoDetail() {
     isError,
   } = useQuery({
     queryKey: ["todo", id],
-    queryFn: () => fetchTodoById(id),
+    queryFn: () => fetchTodoById(id!),
+    enabled: !!id,
   });
 
   if (isLoading) return <div className="p-4">Loading todo...</div>;
   if (isError)
     return <div className="p-4 text-red-500">Error loading todo</div>;
+
+  if (!todo) return <div className="p-4">Todo not found</div>;
 
   return (
     <main className="p-4 h-[100vh] items-center justify-center flex flex-col bg-stone-200">

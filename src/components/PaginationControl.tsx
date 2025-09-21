@@ -7,8 +7,9 @@ import {
   PaginationPrevious,
   PaginationEllipsis,
 } from "@/components/ui/pagination";
+import { PaginationControlProps } from "@/types";
 
-function PaginationControls({ currentPage, totalPages, onPageChange }) {
+function PaginationControls({ currentPage, totalPages, onPageChange }: PaginationControlProps): React.JSX.Element {
   return (
     <Pagination>
       <PaginationContent>

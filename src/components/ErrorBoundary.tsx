@@ -1,16 +1,25 @@
 import React from 'react'
 
-class ErrorBoundary extends React.Component {
-  constructor(props) {
+interface Props {
+  children: React.ReactNode;
+}
+
+interface State {
+  hasError: boolean;
+  error: Error | null;
+}
+
+class ErrorBoundary extends React.Component<Props, State> {
+  constructor(props: Props) {
     super(props)
     this.state = { hasError: false, error: null }
   }
 
-  static getDerivedStateFromError(error) {
+  static getDerivedStateFromError(error: Error): State {
     return { hasError: true, error }
   }
 
-  componentDidCatch(error, errorInfo) {
+  componentDidCatch(error: Error, errorInfo: React.ErrorInfo): void {
     console.error('Caught by Error Boundary:', error, errorInfo)
   }
 

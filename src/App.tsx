@@ -4,7 +4,7 @@ import TodoDetail from "./pages/TodoDetail";
 import NotFound from "./pages/NotFound";
 
 
-function App() {
+function App(): React.JSX.Element {
   return (
     <BrowserRouter>
       <Routes>

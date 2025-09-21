@@ -5,9 +5,9 @@ import { fetchTodos } from "@/lib/api";
 import PaginationControl from "@/components/PaginationControl";
 import { useQuery } from "@tanstack/react-query";
 import CreateTodo from "@/components/CreateTodo";
+import { Todo } from "@/types";
 
-
-function TodoList() {
+function TodoList(): React.JSX.Element {
   const {
     data: todos = [],
     isLoading,
@@ -17,17 +17,17 @@ function TodoList() {
     queryFn: fetchTodos,
   });
 
-    const [localTodos, setLocalTodos] = useState([]);
+    const [localTodos, setLocalTodos] = useState<Todo[]>([]);
 
-  const handleCreate = (newTodo) => {
+  const handleCreate = (newTodo: Todo): void => {
     setLocalTodos((prev) => [newTodo, ...prev]);
   };
 
 
-  const [currentPage, setCurrentPage] = useState(1);
+  const [currentPage, setCurrentPage] = useState<number>(1);
   const todosPerPage = 10;
 
-  const handlePageChange = (page) => {
+  const handlePageChange = (page: number): void => {
     if (page >= 1 && page <= totalPages) {
       setCurrentPage(page);
     }
@@ -39,11 +39,11 @@ function TodoList() {
   );
   const totalPages = Math.ceil(todos.length / todosPerPage);
 
-  const openEditModal = () => {
+  const openEditModal = (): void => {
     console.log("Edit this todo");
   };
 
-  const openDeleteModal = () => {
+  const openDeleteModal = (): void => {
     console.log("Delete this todo");
   };
 

@@ -1,8 +1,9 @@
 import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
+import { TodoListItemProps } from "@/types";
 
-function TodoListItem({ todo, onEdit, onDelete }) {
+function TodoListItem({ todo, onEdit, onDelete }: TodoListItemProps): React.JSX.Element {
   return (
     <li className="md:p-4 p-2 border rounded shadow-sm hover:bg-gray-50  bg-white flex justify-between items-center transition">
       <Link to={`/todos/${todo.id}`} className="flex-1">
