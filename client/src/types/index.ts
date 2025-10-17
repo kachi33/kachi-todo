@@ -1,14 +1,28 @@
+export interface TodoList {
+  id: number;
+  name: string;
+  color: string;
+  todo_count: number;
+}
+
+export interface CreateTodoListData {
+  name: string;
+  color?: string;
+}
+
 export interface Todo {
   id: number;
   title: string;
   completed: boolean;
-  userId: number;
+  list_id: number;
+  list_name: string;
+  userId: string;
 }
 
 export interface CreateTodoData {
   title: string;
+  list_id: number;
   completed?: boolean;
-  userId?: number;
 }
 
 export interface TodoListItemProps {
@@ -25,4 +39,15 @@ export interface PaginationControlProps {
 
 export interface CreateTodoProps {
   onCreate: (todo: Todo) => void;
+}
+
+export interface ProductivityStats {
+  total_todos: number;
+  completed_todos: number;
+  pending_todos: number;
+  completion_rate: number;
+  todos_created_today: number;
+  todos_completed_today: number;
+  active_streak: number;
+  total_productivity_score: number;
 }

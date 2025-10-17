@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import {
   Dialog,
   DialogTrigger,
@@ -12,68 +12,75 @@ import {
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { createTodo } from "@/lib/api";
-import { CirclePlus } from 'lucide-react';
-import { CreateTodoProps } from "@/types";
+import { updateTodo } from "@/lib/api";
+import { Todo } from "@/types";
 
-interface CreateTodoPropsWithList extends CreateTodoProps {
-  selectedListId: number;
+interface EditTodoProps {
+  todo: Todo;
+  onUpdate: (updatedTodo: Todo) => void;
+  open: boolean;
+  onOpenChange: (open: boolean) => void;
 }
 
-function CreateTodo({ onCreate, selectedListId }: CreateTodoPropsWithList): React.JSX.Element {
-  const [title, setTitle] = useState<string>("");
+function EditTodo({ todo, onUpdate, open, onOpenChange }: EditTodoProps): React.JSX.Element {
+  const [title, setTitle] = useState<string>(todo.title);
+  const [completed, setCompleted] = useState<boolean>(todo.completed);
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
 
+  useEffect(() => {
+    setTitle(todo.title);
+    setCompleted(todo.completed);
+  }, [todo]);
+
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>): Promise<void> => {
     e.preventDefault();
-    if (!title.trim() || !selectedListId) return;
+    if (!title.trim()) return;
 
     setIsLoading(true);
     setError(null);
 
     try {
-      const newTodo = await createTodo({
-        title,
-        list_id: selectedListId,
-        completed: false
-      });
-      setTitle("");
-      onCreate && onCreate(newTodo);
+      const updatedTodo = await updateTodo(todo.id, { title, completed });
+      onUpdate(updatedTodo);
+      onOpenChange(false);
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Failed to create todo");
+      setError(err instanceof Error ? err.message : "Failed to update todo");
     } finally {
       setIsLoading(false);
     }
   };
 
   return (
-    <Dialog>
-      <DialogTrigger asChild>
-        <Button disabled={isLoading}>
-                <CirclePlus />
-
-          Add New
-        </Button>
-      </DialogTrigger>
+    <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="sm:max-w-[425px]">
         <form onSubmit={handleSubmit}>
           <DialogHeader>
-            <DialogTitle>Create Todo</DialogTitle>
-            <DialogDescription>Add a new task to your todo list.</DialogDescription>
+            <DialogTitle>Edit Todo</DialogTitle>
+            <DialogDescription>Update your task details.</DialogDescription>
           </DialogHeader>
 
           <div className="grid gap-4 py-4">
             <div className="grid gap-2">
-              <Label htmlFor="title">Title</Label>
+              <Label htmlFor="edit-title">Title</Label>
               <Input
-                id="title"
+                id="edit-title"
                 value={title}
                 onChange={(e) => setTitle(e.target.value)}
                 placeholder="e.g., Walk the dog"
                 required
                 disabled={isLoading}
               />
+            </div>
+            <div className="flex items-center gap-2">
+              <input
+                type="checkbox"
+                id="edit-completed"
+                checked={completed}
+                onChange={(e) => setCompleted(e.target.checked)}
+                disabled={isLoading}
+              />
+              <Label htmlFor="edit-completed">Mark as completed</Label>
             </div>
             {error && <p className="text-red-600">{error}</p>}
           </div>
@@ -85,7 +92,7 @@ function CreateTodo({ onCreate, selectedListId }: CreateTodoPropsWithList): Reac
               </Button>
             </DialogClose>
             <Button type="submit" disabled={isLoading}>
-              {isLoading ? "Adding..." : "Add Todo"}
+              {isLoading ? "Updating..." : "Update Todo"}
             </Button>
           </DialogFooter>
         </form>
@@ -94,4 +101,4 @@ function CreateTodo({ onCreate, selectedListId }: CreateTodoPropsWithList): Reac
   );
 }
 
-export default CreateTodo;
+export default EditTodo;

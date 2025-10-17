@@ -5,9 +5,9 @@ import { TodoListItemProps } from "@/types";
 
 function TodoListItem({ todo, onEdit, onDelete }: TodoListItemProps): React.JSX.Element {
   return (
-    <li className="md:p-4 p-2 border rounded shadow-sm hover:bg-gray-50  bg-white flex justify-between items-center transition">
+    <li className="md:p-4 p-2 border border-border rounded shadow-sm hover:bg-accent bg-card flex justify-between items-center transition-colors">
       <Link to={`/todos/${todo.id}`} className="flex-1">
-        <span className="text-sm font-medium">{todo.title}</span>
+        <span className="text-sm font-medium text-card-foreground">{todo.title}</span>
       </Link>
 
       <div className="flex flex-col md:flex-row md:gap-2 items-center">
