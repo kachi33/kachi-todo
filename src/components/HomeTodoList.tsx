@@ -18,8 +18,12 @@ import { formatDateTime } from "@/lib/dateUtils";
 import TodoListItem from "@/components/TodoListItems";
 import OfflineStatus from "./OfflineStatus";
 import { Separator } from "@/components/ui/separator";
+import { Skeleton } from "@/components/ui/skeleton";
+import { useState } from "react";
 
 function HomeTodoList(): React.JSX.Element {
+  const [forceLoading, setForceLoading] = useState(false);
+  
   const {
     data: todos = [],
     isLoading,
@@ -28,6 +32,8 @@ function HomeTodoList(): React.JSX.Element {
     queryKey: ["todos"],
     queryFn: () => fetchTodos(),
   });
+
+  const showLoading = isLoading || forceLoading;
 
   const { openSidebar, openCreateMode } = useSidebar();
 
@@ -50,33 +56,41 @@ function HomeTodoList(): React.JSX.Element {
     return completed ? "border-l-green-500" : "border-l-yellow-500";
   };
 
-  if (isLoading) {
+  if (showLoading) {
     return (
-    <div className="flex flex-col gap-3 lg:gap-6">
-      <div className="flex items-center  justify-between">
-        <h2 className="text-xl font-semibold text-card-foreground">
-          Recent Tasks
-        </h2>
-        <div className="flex justify-between items-center gap-2">
-          <Button
-            variant="outline"
-            size="lg"
-            className="cursor-pointer"
-            onClick={openCreateMode}
-            title="Create new todo"
-          >
-            <Plus className="h-4 w-4" />
-            Add New Task
-          </Button>
+      <div className="flex flex-col gap-3 lg:gap-6">
+        <div className="flex items-center  justify-between">
+          <h2 className="text-xl font-semibold text-card-foreground">
+            Pending Tasks
+          </h2>
+          <div className="flex justify-between items-center gap-2">
+            <Button
+              variant="outline"
+              size="lg"
+              className="cursor-pointer"
+              onClick={openCreateMode}
+              title="Create new todo"
+            >
+              <Plus className="h-4 w-4" />
+              Add New Task
+            </Button>
+          </div>
         </div>
-      </div>
-      <div className="text-muted-foreground">
-        <Separator className="" />
-        <div className="flex justify-end mt-2">
-          <OfflineStatus />
+        <div className="text-muted-foreground">
+          <Separator className="" />
+          <div className="flex justify-end mt-2">
+            <OfflineStatus />
+          </div>
         </div>
+          <div className="flex items-center space-x-4">
+            <Skeleton className="h-12 w-12 rounded-full" />
+            <div className="space-y-2">
+              <Skeleton className="h-4 w-[250px]" />
+              <Skeleton className="h-4 w-[200px]" />
+            </div>
+          </div>
       </div>
-</div>    );
+    );
   }
 
   if (isError) {
@@ -98,7 +112,7 @@ function HomeTodoList(): React.JSX.Element {
     <div className="flex flex-col gap-3 lg:gap-6">
       <div className="flex items-center  justify-between">
         <h2 className="text-xl font-semibold text-card-foreground">
-          Recent Tasks
+          Pending Tasks
         </h2>
         <div className="flex justify-between items-center gap-2">
           <Button
