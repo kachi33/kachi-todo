@@ -23,7 +23,7 @@ export default function RootLayout({
           <ThemeProvider>
             <SidebarProvider>
               <main className="min-h-screen bg-background transition-colors">
-                <header className="flex justify-between items-center p-4 md:p-6 lg:px-12 lg:py-8">
+                <header className="flex justify-between items-center p-4 md:p-6 lg:px-20 lg:py-12">
                   <h1 className="md:text-2xl font-kaushan text-xl font-bold text-foreground">
                     Kachi's <span className="text-amber-700 text-3xl">ToDo</span>
                   </h1>
@@ -31,7 +31,7 @@ export default function RootLayout({
                     <ThemeToggle />
                   </div>
                 </header>
-                <section className="flex lg:max-w-2xl mx-auto justify-center items-center gap-2 md:gap-4">
+                <section className="flex lg:max-w-2xl mx-auto justify-center items-center gap-2  md:gap-4">
                 {children}
                 </section>
               </main>

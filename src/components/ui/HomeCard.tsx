@@ -33,7 +33,6 @@ const HOMECARD = () => {
     <div className="space-y-6">
       {/* Progress Chart */}
       <div className="space-y-3">
-        <h3 className="text-lg font-semibold text-foreground">Progress Overview</h3>
         <ProgressChart stats={stats} />
       </div>
     </div>
