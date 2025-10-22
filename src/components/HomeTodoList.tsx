@@ -1,13 +1,15 @@
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Calendar, ArrowRight, Plus } from "lucide-react";
+import { Calendar, ArrowRight, Plus, Divide } from "lucide-react";
 import { useQuery } from "@tanstack/react-query";
 import { fetchTodos } from "@/lib/offlineApi";
 import { useSidebar } from "@/contexts/SidebarContext";
 import { Todo } from "@/types";
 import { formatDateTime } from "@/lib/dateUtils";
 import TodoListItem from "@/components/TodoListItems";
+import OfflineStatus from "./OfflineStatus";
+import { Separator } from "@/components/ui/separator";
 
 function HomeTodoList(): React.JSX.Element {
   const {
@@ -40,21 +42,6 @@ function HomeTodoList(): React.JSX.Element {
     return completed ? "border-l-green-500" : "border-l-yellow-500";
   };
 
-  const getPriorityEmoji = (priority: string) => {
-    switch (priority) {
-      case "urgent":
-        return "🔴";
-      case "high":
-        return "🟠";
-      case "medium":
-        return "🟡";
-      case "low":
-        return "🟢";
-      default:
-        return "⚪";
-    }
-  };
-
   if (isLoading) {
     return (
       <div className="bg-card border border-border rounded-lg p-6">
@@ -82,63 +69,65 @@ function HomeTodoList(): React.JSX.Element {
   const hasMoreTodos = todos.length > 3;
 
   return (
-    <div className="bg-card border border-border rounded-lg p-6">
-      <div className="flex justify-between items-center mb-4">
+    <div className="flex flex-col gap-8">
+      <div className="flex items-center  justify-between">
         <h2 className="text-xl font-semibold text-card-foreground">
           Recent Tasks
         </h2>
-        {/* {todos.length > 0 && (
-          <span className="text-sm text-muted-foreground">
-            {todos.length} total task{todos.length !== 1 ? 's' : ''}
-          </span>
-        )} */}
-        <Button
-          variant="ghost"
-          size="sm"
-          className="cursor-pointer"
-          onClick={openCreateMode}
-          title="Create new todo"
-        >
-          <Plus className="h-4 w-4" />
-        </Button>
+        <div className="flex justify-between items-center gap-2">
+          <Button
+            variant="outline"
+            size="lg"
+            className="cursor-pointer"
+            onClick={openCreateMode}
+            title="Create new todo"
+          >
+            <Plus className="h-4 w-4" />
+            Add New Task
+          </Button>
+        </div>
       </div>
-
-      {todos.length === 0 ? (
-        <div className="text-center py-8">
-          <div className="text-muted-foreground mb-4">
-            <h3 className="text-lg font-medium text-foreground mb-2">
-              No tasks yet
-            </h3>
-            <p>Create your first task to get started!</p>
-          </div>
-          <Link href="/todos">
-            <Button>Create Your First Task</Button>
-          </Link>
+      <div className="text-muted-foreground">
+        <Separator />
+        <div className="flex justify-end mt-2">
+          <OfflineStatus />
         </div>
-      ) : (
-        <div className="space-y-4">
-          <ul className="space-y-3">
-            {recentTodos.map((todo: Todo) => (
-              <TodoListItem
-                key={todo.id}
-                todo={todo}
-              />
-            ))}
-          </ul>
-
-          {hasMoreTodos && (
-            <div className="pt-4 border-t border-border">
-              <Link href="/todos">
-                <Button variant="outline" className="w-full" size="sm">
-                  <ArrowRight className="h-4 w-4 mr-2" />
-                  See More ({todos.length - 3} more task
-                  {todos.length - 3 !== 1 ? "s" : ""})
-                </Button>
-              </Link>
+      </div>
+      <div className="bg-card border border-border rounded-lg p-6">
+        {todos.length === 0 ? (
+          <div className="text-center py-8">
+            <div className="text-muted-foreground mb-4">
+              <h3 className="text-lg font-medium text-foreground mb-2">
+                No tasks yet
+              </h3>
+              <p>Create your first task to get started!</p>
             </div>
-          )}
-        </div>
-      )}
+            <Link href="/todos">
+              <Button>Create Your First Task</Button>
+            </Link>
+          </div>
+        ) : (
+          <div className="space-y-4">
+            <ul className="space-y-3">
+              {recentTodos.map((todo: Todo) => (
+                <TodoListItem key={todo.id} todo={todo} />
+              ))}
+            </ul>
+
+            {hasMoreTodos && (
+              <div className="pt-4 border-t border-border">
+                <Link href="/todos">
+                  <Button variant="outline" className="w-full" size="sm">
+                    <ArrowRight className="h-4 w-4 mr-2" />
+                    See More ({todos.length - 3} more task
+                    {todos.length - 3 !== 1 ? "s" : ""})
+                  </Button>
+                </Link>
+              </div>
+            )}
+          </div>
+        )}
+      </div>
     </div>
   );
 }

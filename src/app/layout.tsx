@@ -5,7 +5,6 @@ import { ThemeProvider } from '@/contexts/ThemeContext'
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import QueryProvider from '@/providers/QueryProvider'
 import ThemeToggle from '@/components/ThemeToggle'
-import OfflineStatus from '@/components/OfflineStatus'
 
 export const metadata: Metadata = {
   title: "Kachi's ToDo App",
@@ -25,11 +24,10 @@ export default function RootLayout({
             <SidebarProvider>
               <main className="min-h-screen bg-background transition-colors">
                 <header className="flex justify-between items-center p-4 md:p-6 lg:px-12 lg:py-8">
-                  <h1 className="md:text-2xl text-xl font-bold text-foreground">
+                  <h1 className="md:text-2xl font-kaushan text-xl font-bold text-foreground">
                     Kachi's <span className="text-amber-700 text-3xl">ToDo</span>
                   </h1>
                   <div className="flex items-center gap-2">
-                    <OfflineStatus />
                     <ThemeToggle />
                   </div>
                 </header>
