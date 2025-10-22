@@ -1,0 +1,48 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model TodoList {
+  id         Int      @id @default(autoincrement())
+  sessionId  String   @map("session_id") @db.VarChar(36)
+  name       String   @db.VarChar(100)
+  color      String   @default("blue") @db.VarChar(20)
+  createdAt  DateTime @default(now()) @map("created_at")
+  updatedAt  DateTime @updatedAt @map("updated_at")
+
+  todos      Todo[]
+
+  @@index([sessionId])
+  @@map("todo_lists")
+}
+
+model Todo {
+  id         Int      @id @default(autoincrement())
+  sessionId  String   @map("session_id") @db.VarChar(36)
+  listId     Int      @map("list_id")
+  title      String   @db.VarChar(200)
+  detail     String?  @db.Text
+  priority   String   @default("medium") @db.VarChar(20)
+  dueDate    String?  @map("due_date") @db.VarChar(10)
+  dueTime    String?  @map("due_time") @db.VarChar(5)
+  completed  Boolean  @default(false)
+  createdAt  DateTime @default(now()) @map("created_at")
+  updatedAt  DateTime @updatedAt @map("updated_at")
+
+  todoList   TodoList @relation(fields: [listId], references: [id], onDelete: Cascade)
+
+  @@index([sessionId])
+  @@index([listId])
+  @@map("todos")
+}
