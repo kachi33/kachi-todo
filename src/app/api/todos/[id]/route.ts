@@ -46,7 +46,7 @@ export async function GET(
       due_time: todo.dueTime,
       completed: todo.completed,
       list_id: todo.listId,
-      list_name: todo.todoList.name,
+      list_name: todo.todoList?.name || null,
       userId: todo.sessionId,
       created_at: todo.createdAt.toISOString(),
       updated_at: todo.updatedAt.toISOString()
@@ -111,6 +111,8 @@ export async function PUT(
       }
     }
 
+    const finalListId = list_id !== undefined ? list_id : existingTodo.listId;
+
     const updatedTodo = await prisma.todo.update({
       where: { id: todoId },
       data: {
@@ -120,14 +122,14 @@ export async function PUT(
         dueDate: due_date !== undefined ? due_date : existingTodo.dueDate,
         dueTime: due_time !== undefined ? due_time : existingTodo.dueTime,
         completed: completed !== undefined ? completed : existingTodo.completed,
-        listId: list_id !== undefined ? list_id : existingTodo.listId
+        listId: finalListId
       },
       include: {
-        todoList: {
+        todoList: finalListId ? {
           select: {
             name: true
           }
-        }
+        } : false
       }
     })
 
@@ -141,7 +143,7 @@ export async function PUT(
       due_time: updatedTodo.dueTime,
       completed: updatedTodo.completed,
       list_id: updatedTodo.listId,
-      list_name: updatedTodo.todoList.name,
+      list_name: updatedTodo.todoList?.name || null,
       userId: updatedTodo.sessionId,
       created_at: updatedTodo.createdAt.toISOString(),
       updated_at: updatedTodo.updatedAt.toISOString()

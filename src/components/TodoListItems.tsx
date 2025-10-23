@@ -85,9 +85,11 @@ function TodoListItem({
                   </div>
                 </div>
               )}
-              <Badge variant="outline" className="text-xs">
-                {todo.list_name}
-              </Badge>
+              {todo.list_name && (
+                <Badge variant="outline" className="text-xs">
+                  {todo.list_name}
+                </Badge>
+              )}
 
             </div>
 

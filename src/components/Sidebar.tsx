@@ -1,76 +1,103 @@
-import { useState } from 'react';
-import { X, ChevronLeft, ChevronRight, Calendar, Clock, User, Tag, FileText, Save } from 'lucide-react';
-import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { Textarea } from '@/components/ui/textarea';
-import { Select, SelectItem } from '@/components/ui/select';
-import { useQuery, useQueryClient } from '@tanstack/react-query';
-import { createTodo, fetchTodoLists } from '@/lib/offlineApi';
-import { Todo, TodoList, CreateTodoData } from '@/types';
+import { useState } from "react";
+import {
+  X,
+  ChevronLeft,
+  ChevronRight,
+  Calendar,
+  Clock,
+  Tag,
+  FileText,
+  Save,
+} from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Textarea } from "@/components/ui/textarea";
+import { Select, SelectItem } from "@/components/ui/select";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
+import { createTodo, fetchTodoLists } from "@/lib/offlineApi";
+import { Todo, TodoList, CreateTodoData } from "@/types";
+import { toast } from "sonner";
+import { Calendar24 } from "@/components/Calendar24";
+
+// Utility function to format Date to ISO string (YYYY-MM-DD)
+const formatDateToISO = (date?: Date) =>
+  date ? date.toISOString().split("T")[0] : undefined;
 
 interface SidebarProps {
   todo: Todo | null;
-  mode: 'view' | 'create';
+  mode: "view" | "create";
   isOpen: boolean;
   onClose: () => void;
   onToggle: () => void;
 }
 
-export const Sidebar = ({ todo, mode, isOpen, onClose, onToggle }: SidebarProps) => {
+export const Sidebar = ({
+  todo,
+  mode,
+  isOpen,
+  onClose,
+  onToggle,
+}: SidebarProps) => {
   const [isCollapsed, setIsCollapsed] = useState(false);
   const queryClient = useQueryClient();
 
   // Create todo form state
-  const [title, setTitle] = useState('');
-  const [detail, setDetail] = useState('');
-  const [priority, setPriority] = useState('medium');
-  const [dueDate, setDueDate] = useState('');
-  const [dueTime, setDueTime] = useState('');
+  const [title, setTitle] = useState("");
+  const [detail, setDetail] = useState("");
+  const [dueDate, setDueDate] = useState<Date | undefined>(undefined);
+  const [dueTime, setDueTime] = useState("");
+  const [priority, setPriority] = useState("low");
   const [selectedListId, setSelectedListId] = useState<number | null>(null);
   const [isCreating, setIsCreating] = useState(false);
 
   // Fetch todo lists for create mode
   const { data: todoLists = [] } = useQuery({
-    queryKey: ['todoLists'],
+    queryKey: ["todoLists"],
     queryFn: () => fetchTodoLists(),
-    enabled: mode === 'create',
+    enabled: mode === "create",
   });
 
   const handleCreateTodo = async () => {
-    if (!title.trim() || !selectedListId) return;
+    if (!title.trim()) return;
 
     setIsCreating(true);
     try {
       const todoData: CreateTodoData = {
         title: title.trim(),
         detail: detail.trim() || undefined,
-        priority,
-        due_date: dueDate || undefined,
+        due_date: formatDateToISO(dueDate),
         due_time: dueTime || undefined,
-        list_id: selectedListId,
+        priority,
+        list_id: selectedListId || undefined,
         completed: false,
       };
 
       await createTodo(todoData);
 
       // Reset form
-      setTitle('');
-      setDetail('');
-      setPriority('medium');
-      setDueDate('');
-      setDueTime('');
+      setTitle("");
+      setDetail("");
+      setDueDate(undefined);
+      setDueTime("");
+      setPriority("low");
       setSelectedListId(null);
 
       // Refresh todos
-      queryClient.invalidateQueries({ queryKey: ['todos'] });
-      queryClient.invalidateQueries({ queryKey: ['todoLists'] });
+      queryClient.invalidateQueries({ queryKey: ["todos"] });
+      queryClient.invalidateQueries({ queryKey: ["todoLists"] });
 
       // Close sidebar
       onClose();
+      toast.success("Task created successfully");
     } catch (error) {
-      console.error('Failed to create todo:', error);
+      toast.error(
+        `Failed to create task: ${
+          error instanceof Error ? error.message : String(error)
+        }`
+      );
+      console.error("Failed to create task:", error);
     } finally {
       setIsCreating(false);
     }
@@ -78,26 +105,31 @@ export const Sidebar = ({ todo, mode, isOpen, onClose, onToggle }: SidebarProps)
 
   const getPriorityColor = (priority: string) => {
     switch (priority) {
-      case 'urgent': return 'bg-red-100 text-red-800 border-red-200';
-      case 'high': return 'bg-orange-100 text-orange-800 border-orange-200';
-      case 'medium': return 'bg-yellow-100 text-yellow-800 border-yellow-200';
-      case 'low': return 'bg-green-100 text-green-800 border-green-200';
-      default: return 'bg-gray-100 text-gray-800 border-gray-200';
+      case "urgent":
+        return "bg-red-100 text-red-800 border-red-200";
+      case "high":
+        return "bg-orange-100 text-orange-800 border-orange-200";
+      case "medium":
+        return "bg-yellow-100 text-yellow-800 border-yellow-200";
+      case "low":
+        return "bg-green-100 text-green-800 border-green-200";
+      default:
+        return "bg-gray-100 text-gray-800 border-gray-200";
     }
   };
 
   const formatDate = (dateString?: string) => {
-    if (!dateString) return 'Not set';
-    return new Date(dateString).toLocaleDateString('en-US', {
-      weekday: 'long',
-      year: 'numeric',
-      month: 'long',
-      day: 'numeric'
+    if (!dateString) return "Not set";
+    return new Date(dateString).toLocaleDateString("en-US", {
+      weekday: "long",
+      year: "numeric",
+      month: "long",
+      day: "numeric",
     });
   };
 
   const formatTime = (timeString?: string) => {
-    if (!timeString) return 'Not set';
+    if (!timeString) return "Not set";
     return timeString;
   };
 
@@ -112,17 +144,19 @@ export const Sidebar = ({ todo, mode, isOpen, onClose, onToggle }: SidebarProps)
       />
 
       {/* Sidebar */}
-      <div className={`
+      <div
+        className={`
         fixed top-0 right-0 h-full bg-background border-l border-border z-50
         transition-all duration-300 ease-in-out
-        ${isCollapsed ? 'w-12' : 'w-80 lg:w-96'}
-        ${isOpen ? 'translate-x-0' : 'translate-x-full'}
-      `}>
+        ${isCollapsed ? "w-12" : "w-80 lg:w-96"}
+        ${isOpen ? "translate-x-0" : "translate-x-full"}
+      `}
+      >
         {/* Header */}
         <div className="flex items-center justify-between p-4 border-b border-border">
           {!isCollapsed && (
             <h2 className="text-lg font-semibold text-foreground">
-              {mode === 'create' ? 'Create New Todo' : 'Todo Details'}
+              {mode === "create" ? "Create New Todo" : "Todo Details"}
             </h2>
           )}
 
@@ -156,28 +190,56 @@ export const Sidebar = ({ todo, mode, isOpen, onClose, onToggle }: SidebarProps)
         {/* Content */}
         {!isCollapsed && (
           <div className="flex-1 overflow-y-auto p-4 space-y-6">
-            {mode === 'create' ? (
+            {mode === "create" ? (
               <>
                 {/* Create Todo Form */}
                 <div className="space-y-4">
+                  {/* Title */}
                   <div className="space-y-2">
                     <Label htmlFor="title">Title *</Label>
                     <Input
                       id="title"
                       value={title}
                       onChange={(e) => setTitle(e.target.value)}
-                      placeholder="Enter todo title..."
+                      placeholder="New task"
                       className="w-full"
                     />
                   </div>
 
+                  {/* Details */}
                   <div className="space-y-2">
-                    <Label htmlFor="list">List *</Label>
+                    <Label htmlFor="detail">Detail</Label>
+                    <Textarea
+                      id="detail"
+                      value={detail}
+                      onChange={(e) => setDetail(e.target.value)}
+                      placeholder="Add details..."
+                      rows={4}
+                      className="resize-none"
+                    />
+                  </div>
+
+                  {/* Due Date and Time */}
+                  <div className="space-y-2">
+                    <Calendar24
+                      date={dueDate}
+                      time={dueTime}
+                      onDateChange={setDueDate}
+                      onTimeChange={setDueTime}
+                    />
+                  </div>
+
+                  {/* List Selection */}
+                  <div className="space-y-2">
+                    <Label htmlFor="list">List (Optional)</Label>
                     <Select
                       id="list"
                       value={selectedListId?.toString() || ""}
-                      onValueChange={(value) => setSelectedListId(parseInt(value))}
+                      onValueChange={(value) =>
+                        setSelectedListId(value ? parseInt(value) : null)
+                      }
                     >
+                      <SelectItem value="">No List</SelectItem>
                       {todoLists.map((list: TodoList) => (
                         <SelectItem key={list.id} value={list.id.toString()}>
                           📋 {list.name}
@@ -186,9 +248,14 @@ export const Sidebar = ({ todo, mode, isOpen, onClose, onToggle }: SidebarProps)
                     </Select>
                   </div>
 
+                  {/* Priority */}
                   <div className="space-y-2">
                     <Label htmlFor="priority">Priority</Label>
-                    <Select id="priority" value={priority} onValueChange={setPriority}>
+                    <Select
+                      id="priority"
+                      value={priority}
+                      onValueChange={setPriority}
+                    >
                       <SelectItem value="low">Low</SelectItem>
                       <SelectItem value="medium">Medium</SelectItem>
                       <SelectItem value="high">High</SelectItem>
@@ -196,43 +263,11 @@ export const Sidebar = ({ todo, mode, isOpen, onClose, onToggle }: SidebarProps)
                     </Select>
                   </div>
 
-                  <div className="grid grid-cols-2 gap-4">
-                    <div className="space-y-2">
-                      <Label htmlFor="dueDate">Due Date</Label>
-                      <Input
-                        id="dueDate"
-                        type="date"
-                        value={dueDate}
-                        onChange={(e) => setDueDate(e.target.value)}
-                      />
-                    </div>
-                    <div className="space-y-2">
-                      <Label htmlFor="dueTime">Due Time</Label>
-                      <Input
-                        id="dueTime"
-                        type="time"
-                        value={dueTime}
-                        onChange={(e) => setDueTime(e.target.value)}
-                      />
-                    </div>
-                  </div>
-
-                  <div className="space-y-2">
-                    <Label htmlFor="detail">Description</Label>
-                    <Textarea
-                      id="detail"
-                      value={detail}
-                      onChange={(e) => setDetail(e.target.value)}
-                      placeholder="Enter todo description..."
-                      rows={4}
-                      className="resize-none"
-                    />
-                  </div>
-
+                  {/* Create Button */}
                   <div className="flex gap-3 pt-4">
                     <Button
                       onClick={handleCreateTodo}
-                      disabled={!title.trim() || !selectedListId || isCreating}
+                      disabled={!title.trim() || isCreating}
                       className="flex-1"
                     >
                       {isCreating ? (
@@ -254,7 +289,9 @@ export const Sidebar = ({ todo, mode, isOpen, onClose, onToggle }: SidebarProps)
               <>
                 {/* Title */}
                 <div className="space-y-2">
-                  <label className="text-sm font-medium text-muted-foreground">Title</label>
+                  <label className="text-sm font-medium text-muted-foreground">
+                    Title
+                  </label>
                   <h3 className="text-xl font-semibold text-foreground leading-tight">
                     {todo.title}
                   </h3>
@@ -262,7 +299,9 @@ export const Sidebar = ({ todo, mode, isOpen, onClose, onToggle }: SidebarProps)
 
                 {/* Status */}
                 <div className="space-y-2">
-                  <label className="text-sm font-medium text-muted-foreground">Status</label>
+                  <label className="text-sm font-medium text-muted-foreground">
+                    Status
+                  </label>
                   <Badge
                     className={`${
                       todo.completed
@@ -276,10 +315,13 @@ export const Sidebar = ({ todo, mode, isOpen, onClose, onToggle }: SidebarProps)
 
                 {/* Priority */}
                 <div className="space-y-2">
-                  <label className="text-sm font-medium text-muted-foreground">Priority</label>
+                  <label className="text-sm font-medium text-muted-foreground">
+                    Priority
+                  </label>
                   <Badge className={getPriorityColor(todo.priority)}>
                     <Tag className="h-3 w-3 mr-1" />
-                    {todo.priority.charAt(0).toUpperCase() + todo.priority.slice(1)}
+                    {todo.priority.charAt(0).toUpperCase() +
+                      todo.priority.slice(1)}
                   </Badge>
                 </div>
 
@@ -306,12 +348,16 @@ export const Sidebar = ({ todo, mode, isOpen, onClose, onToggle }: SidebarProps)
                 </div>
 
                 {/* List */}
-                <div className="space-y-2">
-                  <label className="text-sm font-medium text-muted-foreground">List</label>
-                  <Badge variant="outline" className="text-sm">
-                    📋 {todo.list_name}
-                  </Badge>
-                </div>
+                {todo.list_name && (
+                  <div className="space-y-2">
+                    <label className="text-sm font-medium text-muted-foreground">
+                      List
+                    </label>
+                    <Badge variant="outline" className="text-sm">
+                      📋 {todo.list_name}
+                    </Badge>
+                  </div>
+                )}
 
                 {/* Description */}
                 <div className="space-y-2">
@@ -334,17 +380,23 @@ export const Sidebar = ({ todo, mode, isOpen, onClose, onToggle }: SidebarProps)
 
                 {/* Metadata */}
                 <div className="space-y-3 pt-4 border-t border-border">
-                  <h4 className="text-sm font-medium text-muted-foreground">Metadata</h4>
+                  <h4 className="text-sm font-medium text-muted-foreground">
+                    Metadata
+                  </h4>
 
                   <div className="space-y-2">
                     <div className="flex justify-between text-xs">
                       <span className="text-muted-foreground">Todo ID:</span>
-                      <span className="text-foreground font-mono">#{todo.id}</span>
+                      <span className="text-foreground font-mono">
+                        #{todo.id}
+                      </span>
                     </div>
 
                     <div className="flex justify-between text-xs">
                       <span className="text-muted-foreground">List ID:</span>
-                      <span className="text-foreground font-mono">#{todo.list_id}</span>
+                      <span className="text-foreground font-mono">
+                        #{todo.list_id}
+                      </span>
                     </div>
 
                     <div className="flex justify-between text-xs">
@@ -353,7 +405,6 @@ export const Sidebar = ({ todo, mode, isOpen, onClose, onToggle }: SidebarProps)
                     </div>
                   </div>
                 </div>
-
               </>
             ) : (
               <div className="flex flex-col items-center justify-center h-64 text-center space-y-4">

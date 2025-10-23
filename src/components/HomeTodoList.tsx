@@ -172,7 +172,7 @@ function HomeTodoList(): React.JSX.Element {
 
           {hasMoreTodos && (
             <div className="pt-4 border-t border-border">
-              <Link href="/todos">
+              <Link href="/tasks">
                 <Button variant="outline" className="w-full" size="sm">
                   <ArrowRight className="h-4 w-4 mr-2" />
                   See More ({pendingTodos.length - 3} more pending task

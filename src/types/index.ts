@@ -18,14 +18,14 @@ export interface Todo {
   due_date?: string;
   due_time?: string;
   completed: boolean;
-  list_id: number;
-  list_name: string;
+  list_id?: number;
+  list_name?: string;
   userId: string;
 }
 
 export interface CreateTodoData {
   title: string;
-  list_id: number;
+  list_id?: number;
   detail?: string;
   priority?: string;
   due_date?: string;

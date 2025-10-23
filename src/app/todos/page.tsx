@@ -11,7 +11,6 @@ import EditTodo from "@/components/EditTodo";
 import DeleteTodo from "@/components/DeleteTodo";
 import ThemeToggle from "@/components/ThemeToggle";
 import { Todo } from "@/types";
-import Layout from "@/components/Layouts/Layout";
 import FilterModal, { FilterOptions } from "@/components/FilterModal";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -176,10 +175,7 @@ function TodoList(): React.JSX.Element {
   };
 
   return (
-    <Layout>
-      <div>
-
-      </div>
+    <>
       <div className="p-4 w-full">
         {todos.length > 0 ? (
           <>
@@ -321,7 +317,7 @@ function TodoList(): React.JSX.Element {
         currentFilters={filters}
         availableLists={todoLists}
       />
-    </Layout>
+    </>
   );
 }
 

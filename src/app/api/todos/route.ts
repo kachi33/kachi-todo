@@ -43,7 +43,7 @@ export async function GET(request: NextRequest) {
       due_time: todo.dueTime,
       completed: todo.completed,
       list_id: todo.listId,
-      list_name: todo.todoList.name,
+      list_name: todo.todoList?.name || null,
       userId: todo.sessionId,
       created_at: todo.createdAt.toISOString(),
       updated_at: todo.updatedAt.toISOString()
@@ -79,19 +79,21 @@ export async function POST(request: NextRequest) {
       )
     }
 
-    // Ensure the list exists and belongs to this session
-    const list = await prisma.todoList.findFirst({
-      where: {
-        id: list_id || 1,
-        sessionId
-      }
-    })
+    // If list_id is provided, ensure the list exists and belongs to this session
+    if (list_id) {
+      const list = await prisma.todoList.findFirst({
+        where: {
+          id: list_id,
+          sessionId
+        }
+      })
 
-    if (!list) {
-      return NextResponse.json(
-        { error: 'List not found' },
-        { status: 404 }
-      )
+      if (!list) {
+        return NextResponse.json(
+          { error: 'List not found' },
+          { status: 404 }
+        )
+      }
     }
 
     const todo = await prisma.todo.create({
@@ -102,14 +104,14 @@ export async function POST(request: NextRequest) {
         dueDate: due_date || null,
         dueTime: due_time || null,
         sessionId,
-        listId: list_id || list.id
+        listId: list_id || null
       },
       include: {
-        todoList: {
+        todoList: list_id ? {
           select: {
             name: true
           }
-        }
+        } : false
       }
     })
 
@@ -123,7 +125,7 @@ export async function POST(request: NextRequest) {
       due_time: todo.dueTime,
       completed: todo.completed,
       list_id: todo.listId,
-      list_name: todo.todoList.name,
+      list_name: todo.todoList?.name || null,
       userId: todo.sessionId,
       created_at: todo.createdAt.toISOString(),
       updated_at: todo.updatedAt.toISOString()

@@ -6,6 +6,8 @@ import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import QueryProvider from '@/providers/QueryProvider'
 import ThemeToggle from '@/components/ThemeToggle'
 import SidebarWrapper from '@/components/SidebarWrapper'
+import { Toaster } from "@/components/ui/sonner"
+
 
 export const metadata: Metadata = {
   title: "Kachi's ToDo App",
@@ -36,6 +38,7 @@ export default function RootLayout({
                 {children}
                 </section>
               </main>
+              <Toaster />
               <SidebarWrapper />
             </SidebarProvider>
           </ThemeProvider>

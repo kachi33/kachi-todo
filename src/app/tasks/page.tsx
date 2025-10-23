@@ -152,7 +152,7 @@ function Tasks(): React.JSX.Element {
         </div>
       </div>
 
-      {todos.length < 0 ? (
+      {todos.length > 0 ? (
         <>
           <div className="mb-4 p-4 bg-card border border-border rounded-lg">
             <h2 className="text-lg font-semibold text-card-foreground">
@@ -182,7 +182,7 @@ function Tasks(): React.JSX.Element {
           )}
         </>
       ) : (
-        <Empty className="from-muted/50 to-backgroundh-full bg-linear-to-b from-30%">
+        <Empty className="from-muted/50 to-background h-full bg-linear-to-b from-30%">
           <EmptyHeader className="">
             <EmptyMedia variant="icon" className="">
               <ListTodo />
