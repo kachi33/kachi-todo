@@ -1,4 +1,3 @@
-import * as React from "react"
 import * as SheetPrimitive from "@radix-ui/react-dialog"
 import { XIcon } from "lucide-react"
 
@@ -84,8 +83,8 @@ function SheetHeader({
 }) {
   return (
     <div
-      data-slot="sheet-header"
-      className={cn("flex flex-col gap-1.5 p-4", className)}
+    data-slot="sheet-header"
+      className={cn("flex flex-col gap-1.5 px-4 py-6 md:py-8 lg:py-12", className)}
       {...props} />
   );
 }
@@ -109,7 +108,7 @@ function SheetTitle({
   return (
     <SheetPrimitive.Title
       data-slot="sheet-title"
-      className={cn("text-foreground font-semibold", className)}
+      className={cn("text-xl text-foreground font-medium", className)}
       {...props} />
   );
 }

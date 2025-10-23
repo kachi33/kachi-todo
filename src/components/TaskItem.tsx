@@ -1,23 +1,22 @@
 import { useState, useEffect, useMemo } from "react";
-import { ArrowUpNarrowWide, BadgeIcon, CircleDot, ListStart, ListTree, Save } from "lucide-react";
+import { ArrowUpNarrowWide, BadgeIcon, Check, CircleDot, ListTree, Save } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
+import { Select, SelectItem } from "@/components/ui/select";
 import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { createTodo, updateTodo, fetchTodoLists } from "@/lib/offlineApi";
 import { Todo, TodoList, CreateTodoData } from "@/types";
 import { toast } from "sonner";
 import { EnhancedCalendar } from "@/components/EnhancedCalendar";
-import { Arrow } from "@radix-ui/react-popover";
+import { Separator } from "./ui/separator";
 
 // Utility function to format Date to ISO string (YYYY-MM-DD)
 const formatDateToISO = (date?: Date) =>
@@ -197,7 +196,7 @@ export const TaskItem = ({ todo, onSave, onClose }: TaskItemProps) => {
   };
 
   return (
-    <div className="space-y-4 bg-green-50 p-2">
+    <div className="space-y-4 px-6">
       {/* Title */}
       <div className="space-y-2">
         <Label htmlFor="title" className=""></Label>
@@ -282,37 +281,56 @@ export const TaskItem = ({ todo, onSave, onClose }: TaskItemProps) => {
 
 
         {/* List Selection */}
-        <div className="space-y-2 flex bg-amber-200 items-center">
+        <div className="space-y-2 flex items-center">
           <Label htmlFor="list" className="w-1/3">
             <ListTree className="inline mr-1 h-4 w-4" />
             List
           </Label>
           <div className="flex-1">
-            <Select
-              value={selectedListId?.toString() || ""}
-              onValueChange={(value) =>
-                setSelectedListId(value ? parseInt(value) : null)
-              }
-            >
-              <SelectTrigger className="w-full border-none outline-none focus:outline-none focus:ring-0 focus-visible:ring-0 focus-visible:ring-offset-0 bg-transparent px-0">
-                <SelectValue placeholder="Not set" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="">Not Set</SelectItem>
-                {todoLists.map((list: TodoList) => (
-                  <SelectItem key={list.id} value={list.id.toString()}>
-                    {list.name}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
+            <Popover>
+              <PopoverTrigger asChild>
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  className="w-full justify-start text-left font-normal border-none outline-none focus:outline-none focus:ring-0 focus-visible:ring-0 focus-visible:ring-offset-0 bg-transparent hover:bg-transparent px-0"
+                >
+                  {selectedListId
+                    ? todoLists.find((list) => list.id === selectedListId)?.name || "Not Set"
+                    : "Not Set"}
+                </Button>
+              </PopoverTrigger>
+              <PopoverContent
+                className="w-[200px] p-0 bg-green-50"
+                align="start"
+                sideOffset={8}
+              >
+                <div className="flex flex-col">
+                  <button
+                    onClick={() => setSelectedListId(null)}
+                    className="px-4 py-2 text-left text-sm hover:bg-green-100 transition-colors flex items-center justify-between"
+                  >
+                    <span>Not Set</span>
+                    {!selectedListId && <Check className="h-4 w-4" />}
+                  </button>
+                  {todoLists.map((list: TodoList) => (
+                    <button
+                      key={list.id}
+                      onClick={() => setSelectedListId(list.id)}
+                      className="px-4 py-2 text-left text-sm hover:bg-green-100 transition-colors flex items-center justify-between"
+                    >
+                      <span>{list.name}</span>
+                      {selectedListId === list.id && <Check className="h-4 w-4" />}
+                    </button>
+                  ))}
+                </div>
+              </PopoverContent>
+            </Popover>
           </div>
         </div>
-      </div>
 
 
         {/* Details */}
-        <div className="space-y-2">
+        <div className="space-y-2 flex flex-col">
           <Label htmlFor="detail" className="">
             Detail
           </Label>
@@ -321,11 +339,13 @@ export const TaskItem = ({ todo, onSave, onClose }: TaskItemProps) => {
             value={detail}
             onChange={(e) => setDetail(e.target.value)}
             placeholder="Add details..."
-            rows={4}
+            rows={2}
             className="resize-none border-none outline-none focus:outline-none focus:ring-0 focus-visible:ring-0 focus-visible:ring-offset-0 bg-transparent"
-          />
+            />
         </div>
 
+            </div>
+            <Separator className="mb-2" />
       {/* Save Button - Only show when there are changes */}
       {hasChanges && (
         <div className="flex gap-3 pt-4">

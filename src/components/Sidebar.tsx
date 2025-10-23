@@ -23,8 +23,13 @@ export const Sidebar = ({
 
   return (
     <Sheet open={isOpen} onOpenChange={onClose}>
-      <SheetContent side="right" className="w-80 lg:w-96 overflow-y-auto">
-        <div className="flex-1 overflow-y-auto py-4 space-y-6">
+      <SheetContent side="right" className="w-80 lg:w-[430px] sm:max-w-none overflow-y-auto">
+        <SheetHeader className="">
+          <SheetTitle className="">
+            {isEditMode ? "Edit Task" : "New Task"}
+          </SheetTitle>
+        </SheetHeader>
+        <div className="flex-1 overflow-y-auto space-y-6">
           <TaskItem todo={todo} onClose={onClose} />
         </div>
       </SheetContent>
