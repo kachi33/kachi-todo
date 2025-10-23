@@ -32,10 +32,10 @@ export function Calendar24({ date, time, onDateChange, onTimeChange }: Calendar2
         <Popover open={open} onOpenChange={setOpen}>
           <PopoverTrigger asChild>
             <Button
-              variant="outline"
+              variant="ghost"
               size="default"
               id="date-picker"
-              className="w-full justify-between font-normal"
+              className="w-full justify-between font-normal border-none outline-none focus:outline-none focus:ring-0 focus-visible:ring-0 focus-visible:ring-offset-0 bg-transparent hover:bg-transparent px-0"
             >
               {date ? date.toLocaleDateString() : "Select date"}
               <ChevronDownIcon className="h-4 w-4" />
@@ -66,7 +66,7 @@ export function Calendar24({ date, time, onDateChange, onTimeChange }: Calendar2
           id="time-picker"
           value={time}
           onChange={(e) => onTimeChange?.(e.target.value)}
-          className="bg-background appearance-none [&::-webkit-calendar-picker-indicator]:hidden [&::-webkit-calendar-picker-indicator]:appearance-none"
+          className="border-none outline-none focus:outline-none focus:ring-0 focus-visible:ring-0 focus-visible:ring-offset-0 bg-transparent appearance-none [&::-webkit-calendar-picker-indicator]:hidden [&::-webkit-calendar-picker-indicator]:appearance-none"
         />
       </div>
     </div>

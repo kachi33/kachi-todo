@@ -1,11 +1,9 @@
 import { useState, useEffect } from "react";
 import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogHeader,
-  DialogTitle,
-} from "@/components/ui/dialog";
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Label } from "@/components/ui/label";
@@ -25,6 +23,7 @@ interface FilterModalProps {
   onApplyFilters: (filters: FilterOptions) => void;
   currentFilters: FilterOptions;
   availableLists: { id: number; name: string }[];
+  children: React.ReactNode;
 }
 
 function FilterModal({
@@ -33,6 +32,7 @@ function FilterModal({
   onApplyFilters,
   currentFilters,
   availableLists,
+  children,
 }: FilterModalProps): React.JSX.Element {
   const [tempFilters, setTempFilters] = useState<FilterOptions>({
     priority: currentFilters.priority || [],
@@ -120,16 +120,19 @@ function FilterModal({
   const priorities = ["urgent", "high", "medium", "low"];
 
   return (
-    <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-[425px]">
-        <DialogHeader>
-          <DialogTitle>Filter Tasks</DialogTitle>
-          <DialogDescription>
+    <Popover open={open} onOpenChange={onOpenChange}>
+      <PopoverTrigger asChild>
+        {children}
+      </PopoverTrigger>
+      <PopoverContent className="w-96 p-0" align="end">
+        <div className="p-4 border-b">
+          <h3 className="text-lg font-semibold">Filter Tasks</h3>
+          <p className="text-sm text-muted-foreground">
             Apply filters to organize your tasks
-          </DialogDescription>
-        </DialogHeader>
+          </p>
+        </div>
 
-        <div className="space-y-6 py-4">
+        <div className="space-y-6 p-4 max-h-[400px] overflow-y-auto">
           {/* Priority Filter */}
           <div className="space-y-3">
             <Label className="text-sm font-semibold">Priority</Label>
@@ -214,7 +217,7 @@ function FilterModal({
           )}
         </div>
 
-        <div className="flex justify-between gap-3">
+        <div className="flex justify-between gap-3 p-4 border-t">
           <Button variant="outline" onClick={handleReset} className="flex-1">
             Reset
           </Button>
@@ -222,8 +225,8 @@ function FilterModal({
             Apply Filters
           </Button>
         </div>
-      </DialogContent>
-    </Dialog>
+      </PopoverContent>
+    </Popover>
   );
 }
 

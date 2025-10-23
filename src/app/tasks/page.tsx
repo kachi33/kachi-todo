@@ -139,16 +139,22 @@ function Tasks(): React.JSX.Element {
       </div>
       <div className="text-muted-foreground">
         <Separator className="" />
-        <div className="flex justify-end mt-2">
+        <div className="flex justify-end mt-2 gap-3">
           <OfflineStatus />
-          <Button
-            onClick={() => setFilterModalOpen(true)}
-            variant="outline"
-            size="default"
-            className="ml-3"
+          <FilterModal
+            open={filterModalOpen}
+            onOpenChange={setFilterModalOpen}
+            onApplyFilters={handleApplyFilters}
+            currentFilters={filters}
+            availableLists={todoLists.map((list) => ({
+              id: list.id,
+              name: list.name,
+            }))}
           >
-            <Filter className="h-4 w-4" />
-          </Button>
+            <Button variant="outline" size="default" className="">
+              <Filter className="h-4 w-4" />
+            </Button>
+          </FilterModal>
         </div>
       </div>
 
@@ -225,17 +231,6 @@ function Tasks(): React.JSX.Element {
           onOpenChange={(open) => !open && setDeleteTodo(null)}
         />
       )}
-
-      <FilterModal
-        open={filterModalOpen}
-        onOpenChange={setFilterModalOpen}
-        onApplyFilters={handleApplyFilters}
-        currentFilters={filters}
-        availableLists={todoLists.map((list) => ({
-          id: list.id,
-          name: list.name,
-        }))}
-      />
     </div>
   );
 }

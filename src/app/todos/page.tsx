@@ -188,20 +188,27 @@ function TodoList(): React.JSX.Element {
                   </h1>
                 </div>
 <div className="flex items-center justify-between gap-3">
-                <Button
-                  variant="outline"
-                  size="sm"
-                  onClick={() => setIsFilterModalOpen(true)}
-                  className="relative"
+                <FilterModal
+                  open={isFilterModalOpen}
+                  onOpenChange={setIsFilterModalOpen}
+                  onApplyFilters={handleApplyFilters}
+                  currentFilters={filters}
+                  availableLists={todoLists}
                 >
-                  <Filter className="h-4 w-4 mr-2" />
-                  {/* Filters */}
-                  {activeFiltersCount > 0 && (
-                    <Badge className="ml-2 bg-primary text-primary-foreground">
-                      {activeFiltersCount}
-                    </Badge>
-                  )}
-                </Button>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    className="relative"
+                  >
+                    <Filter className="h-4 w-4 mr-2" />
+                    {/* Filters */}
+                    {activeFiltersCount > 0 && (
+                      <Badge className="ml-2 bg-primary text-primary-foreground">
+                        {activeFiltersCount}
+                      </Badge>
+                    )}
+                  </Button>
+                </FilterModal>
                   <CreateTodoWithListSelector onCreate={handleCreate} />
                 </div>
               </div>
@@ -309,14 +316,6 @@ function TodoList(): React.JSX.Element {
           onOpenChange={(open) => !open && setDeleteTodo(null)}
         />
       )} */}
-
-      <FilterModal
-        open={isFilterModalOpen}
-        onOpenChange={setIsFilterModalOpen}
-        onApplyFilters={handleApplyFilters}
-        currentFilters={filters}
-        availableLists={todoLists}
-      />
     </>
   );
 }

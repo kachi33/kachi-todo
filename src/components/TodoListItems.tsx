@@ -1,12 +1,22 @@
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Calendar, EllipsisVertical, Trash2, Move3d } from "lucide-react";
+import { Calendar, EllipsisVertical, Trash2, Edit2 } from "lucide-react";
 import { useSidebar } from "@/contexts/SidebarContext";
 import { TodoListItemProps } from "@/types";
 import { formatDateTime } from "@/lib/dateUtils";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { fetchTodoLists, updateTodo } from "@/lib/offlineApi";
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+} from "@/components/ui/select";
 
 function TodoListItem({
   todo,
@@ -14,8 +24,7 @@ function TodoListItem({
   onDelete,
 }: TodoListItemProps): React.JSX.Element {
   const { openSidebar } = useSidebar();
-  const [openMore, setOpenMore] = useState(false);
-  const [showMoveMenu, setShowMoveMenu] = useState(false);
+  const [popoverOpen, setPopoverOpen] = useState(false);
   const queryClient = useQueryClient();
 
   // Fetch available lists
@@ -31,8 +40,7 @@ function TodoListItem({
     onSuccess: () => {
       // Invalidate and refetch todos
       queryClient.invalidateQueries({ queryKey: ["todos"] });
-      setShowMoveMenu(false);
-      setOpenMore(false);
+      setPopoverOpen(false);
     },
     onError: (error) => {
       console.error("Failed to move todo:", error);
@@ -97,65 +105,91 @@ function TodoListItem({
         </div>
 
           </div>
-        <div className="hidden md:flex cursor-pointer items-start">
-          <EllipsisVertical
-            className="h-4 w-4 text-muted-foreground"
-            onClick={setOpenMore.bind(null, !openMore)}
-          />
-        </div>
-      {openMore && (
-        <div className="relative flex items">
-          <div className="absolute top-0 right-0 bg-card border border-border rounded-md shadow-md w-32 z-10">
-            <ul className="p-2 space-y-2">
-                    <li
-                      className="text-muted-foreground flex items-center justify-between text-sm cursor-pointer hover:text-foreground"
-                      onClick={() => setShowMoveMenu(!showMoveMenu)}
-                    >
-                      Move to
-                      <Move3d className="h-4 w-4 ml-1" />
-                    </li>
-                    {showMoveMenu && (
-                      <ul className="ml-2 mt-1 space-y-1">
-                        {lists
-                          .filter(list => list.id !== todo.list_id)
-                          .map(list => (
-                            <li
-                              key={list.id}
-                              className="text-sm text-foreground cursor-pointer hover:bg-accent px-2 py-1 rounded"
-                              onClick={() => {
-                                moveTodoMutation.mutate({
-                                  todoId: todo.id,
-                                  listId: list.id,
-                                });
-                              }}
-                            >
-                              {list.name}
-                            </li>
-                          ))}
-                        {lists.filter(list => list.id !== todo.list_id).length === 0 && (
-                          <li className="text-xs text-muted-foreground px-2 py-1">
-                            No other lists available
-                          </li>
-                        )}
-                      </ul>
+        <Popover open={popoverOpen} onOpenChange={setPopoverOpen}>
+          <PopoverTrigger asChild>
+            <div className="hidden md:flex cursor-pointer items-start">
+              <EllipsisVertical className="h-4 w-4 text-muted-foreground" />
+            </div>
+          </PopoverTrigger>
+          <PopoverContent className="w-56 p-0" align="end">
+            <div className="p-2 space-y-1">
+
+              {/* Move to List */}
+              <div className="p-2">
+                <label className="text-xs text-muted-foreground mb-1 block">
+                  Move to list
+                </label>
+                <Select
+                  onValueChange={(listId) => {
+                    moveTodoMutation.mutate({
+                      todoId: todo.id,
+                      listId: parseInt(listId),
+                    });
+                  }}
+                >
+                  <SelectContent>
+                    {lists
+                      .filter((list) => list.id !== todo.list_id)
+                      .map((list) => (
+                        <SelectItem key={list.id} value={list.id.toString()}>
+                          {list.name}
+                        </SelectItem>
+                      ))}
+                    {lists.filter((list) => list.id !== todo.list_id)
+                      .length === 0 && (
+                      <option disabled className="text-xs text-muted-foreground">
+                        No other lists available
+                      </option>
                     )}
-                    <li
-                      className=""
-                      onClick={() => onEdit(todo)}
-                    >
-                      Edit 
-                    </li>
-                    <li
-                    className="text-destructive text-sm flex items-center justify-between"
-                    onClick={() => onDelete(todo)}
-                    >
-                      Delete
-                    <Trash2 className="h-4 w-4  ml-1" />
-                    </li>
-            </ul>
-          </div>
-        </div>
-      )}
+                  </SelectContent>
+                </Select>
+              </div>
+
+              {/* Divider */}
+              <div className="border-t border-border" />
+
+                {/* Mark as completed */}
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  className="w-full justify-start text-sm"
+                  onClick={() => {
+                    setPopoverOpen(false);
+                  }}
+                >
+                  <Calendar className="h-4 w-4 mr-2" />
+                  Mark as Completed
+                </Button>
+              {/* Edit Button */}
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  className="w-full justify-start text-sm"
+                  onClick={() => {
+                    setPopoverOpen(false);
+                  }}
+                >
+                  <Edit2 className="h-4 w-4 mr-2" />
+                  Edit
+                </Button>
+
+              {/* Don't forget to push to set sidebar open */}
+
+              {/* Delete Button */}
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  className="w-full justify-start text-sm text-destructive hover:text-destructive hover:bg-destructive/10"
+                  onClick={() => {
+                    setPopoverOpen(false);
+                  }}
+                >
+                  <Trash2 className="h-4 w-4 mr-2" />
+                  Delete
+                </Button>
+            </div>
+          </PopoverContent>
+        </Popover>
     </li>
   );
 }

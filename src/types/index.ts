@@ -17,6 +17,8 @@ export interface Todo {
   priority: string;
   due_date?: string;
   due_time?: string;
+  end_time?: string;
+  end_date?: string;
   completed: boolean;
   list_id?: number;
   list_name?: string;
@@ -30,6 +32,8 @@ export interface CreateTodoData {
   priority?: string;
   due_date?: string;
   due_time?: string;
+  end_time?: string;
+  end_date?: string;
   completed?: boolean;
 }
 
