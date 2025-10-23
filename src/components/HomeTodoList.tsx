@@ -1,6 +1,5 @@
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
 import { Calendar, ArrowRight, Plus, Divide, ListTodo } from "lucide-react";
 import {
   Empty,
@@ -104,9 +103,12 @@ function HomeTodoList(): React.JSX.Element {
     );
   }
 
-  // Show only the first 3 todos
-  const recentTodos = todos.slice(0, 3);
-  const hasMoreTodos = todos.length > 3;
+  // Filter for pending (incomplete) todos only
+  const pendingTodos = todos.filter((todo: Todo) => !todo.completed);
+
+  // Show only the first 3 pending todos
+  const recentTodos = pendingTodos.slice(0, 3);
+  const hasMoreTodos = pendingTodos.length > 3;
 
   return (
     <div className="flex flex-col gap-3 lg:gap-6">
@@ -134,20 +136,22 @@ function HomeTodoList(): React.JSX.Element {
         </div>
       </div>
       {/* <div className="bg-card border border-border rounded-lg p-6"> */}
-      {todos.length === 0 ? (
-        <Empty className="from-muted/50 to-backgroundh-full bg-linear-to-b from-30%">
+      {pendingTodos.length === 0 ? (
+        <Empty className="from-muted/50 to-background h-full bg-linear-to-b from-30%">
           <EmptyHeader className="">
             <EmptyMedia variant="icon" className="">
               <ListTodo />
             </EmptyMedia>
             <EmptyTitle className="">All clear for now</EmptyTitle>
             <EmptyDescription className="">
-              You’re all caught up. Take a moment, or plan what’s next.{" "}
+              {todos.length === 0
+                ? "You're all caught up. Take a moment, or plan what's next."
+                : "Great job! All your tasks are complete. Ready for more?"}
             </EmptyDescription>
           </EmptyHeader>
           <EmptyContent className="mt-2">
+            <Link href="/tasks">
             <Button
-              onClick={openCreateMode}
               variant="default"
               size="default"
               className=""
@@ -155,6 +159,7 @@ function HomeTodoList(): React.JSX.Element {
               <Plus className="h-4 w-4" />
               Add New Task
             </Button>
+            </Link>
           </EmptyContent>
         </Empty>
       ) : (
@@ -170,8 +175,8 @@ function HomeTodoList(): React.JSX.Element {
               <Link href="/todos">
                 <Button variant="outline" className="w-full" size="sm">
                   <ArrowRight className="h-4 w-4 mr-2" />
-                  See More ({todos.length - 3} more task
-                  {todos.length - 3 !== 1 ? "s" : ""})
+                  See More ({pendingTodos.length - 3} more pending task
+                  {pendingTodos.length - 3 !== 1 ? "s" : ""})
                 </Button>
               </Link>
             </div>
@@ -179,7 +184,6 @@ function HomeTodoList(): React.JSX.Element {
         </div>
       )}
     </div>
-    // </div>
   );
 }
 

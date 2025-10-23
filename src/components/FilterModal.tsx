@@ -34,10 +34,18 @@ function FilterModal({
   currentFilters,
   availableLists,
 }: FilterModalProps): React.JSX.Element {
-  const [tempFilters, setTempFilters] = useState<FilterOptions>(currentFilters);
+  const [tempFilters, setTempFilters] = useState<FilterOptions>({
+    priority: currentFilters.priority || [],
+    status: currentFilters.status || "all",
+    listId: currentFilters.listId || null,
+  });
 
   useEffect(() => {
-    setTempFilters(currentFilters);
+    setTempFilters({
+      priority: currentFilters.priority || [],
+      status: currentFilters.status || "all",
+      listId: currentFilters.listId || null,
+    });
   }, [currentFilters, open]);
 
   const handlePriorityToggle = (priority: string) => {

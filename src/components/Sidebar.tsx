@@ -5,7 +5,7 @@ import { Badge } from '@/components/ui/badge';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Select, SelectItem } from '@/components/ui/select';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { createTodo, fetchTodoLists } from '@/lib/offlineApi';
 import { Todo, TodoList, CreateTodoData } from '@/types';
@@ -173,32 +173,26 @@ export const Sidebar = ({ todo, mode, isOpen, onClose, onToggle }: SidebarProps)
 
                   <div className="space-y-2">
                     <Label htmlFor="list">List *</Label>
-                    <Select value={selectedListId?.toString()} onValueChange={(value) => setSelectedListId(parseInt(value))}>
-                      <SelectTrigger>
-                        <SelectValue placeholder="Select a list" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        {todoLists.map((list: TodoList) => (
-                          <SelectItem key={list.id} value={list.id.toString()}>
-                            📋 {list.name}
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
+                    <Select
+                      id="list"
+                      value={selectedListId?.toString() || ""}
+                      onValueChange={(value) => setSelectedListId(parseInt(value))}
+                    >
+                      {todoLists.map((list: TodoList) => (
+                        <SelectItem key={list.id} value={list.id.toString()}>
+                          📋 {list.name}
+                        </SelectItem>
+                      ))}
                     </Select>
                   </div>
 
                   <div className="space-y-2">
                     <Label htmlFor="priority">Priority</Label>
-                    <Select value={priority} onValueChange={setPriority}>
-                      <SelectTrigger>
-                        <SelectValue />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="low">🟢 Low</SelectItem>
-                        <SelectItem value="medium">🟡 Medium</SelectItem>
-                        <SelectItem value="high">🟠 High</SelectItem>
-                        <SelectItem value="urgent">🔴 Urgent</SelectItem>
-                      </SelectContent>
+                    <Select id="priority" value={priority} onValueChange={setPriority}>
+                      <SelectItem value="low">Low</SelectItem>
+                      <SelectItem value="medium">Medium</SelectItem>
+                      <SelectItem value="high">High</SelectItem>
+                      <SelectItem value="urgent">Urgent</SelectItem>
                     </Select>
                   </div>
 
