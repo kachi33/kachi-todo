@@ -5,7 +5,7 @@ import { cn } from "@/lib/utils"
 
 function Separator({
   className,
-  orientation = "horizontal",
+  orientation = undefined,
   decorative = true,
   ...props
 }) {

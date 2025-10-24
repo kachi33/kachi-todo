@@ -227,7 +227,7 @@ function Tasks(): React.JSX.Element {
           </div>
         </div>
 
-        <Separator className="" />
+        <Separator className=""  />
         <div className="text-muted-foreground flex items-center justify-between">
           <div className="flex items-center gap-2">
             {/* filter text */}
