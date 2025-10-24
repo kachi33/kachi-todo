@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Calendar, EllipsisVertical, Trash2, Edit2 } from "lucide-react";
+import { Calendar, EllipsisVertical, Trash2, Edit2, Copy } from "lucide-react";
 import { useSidebar } from "@/contexts/SidebarContext";
 import { TodoListItemProps } from "@/types";
 import { formatDateTime } from "@/lib/dateUtils";
@@ -129,7 +129,7 @@ function TodoListItem({
         </PopoverTrigger>
         <PopoverContent className="w-56 p-0" align="end">
           <div className="p-2 space-y-1">
-            {/* Move to List */}
+            {/* Add to List */}
             <div className="p-2">
               <label className="text-xs text-muted-foreground mb-1 block">
                 Move to list
@@ -160,21 +160,30 @@ function TodoListItem({
               </Select>
             </div>
 
+            {/* Remove from list  */}
+
             {/* Divider */}
             <div className="border-t border-border" />
+
+            <Button
+              variant="ghost"
+              size="sm"
+              className="w-full justify-start text-sm"
+            >
+              <Copy className="h-4 w-4 mr-2" />
+              Duplicate Task
+            </Button>
 
             {/* Mark as completed */}
             <Button
               variant="ghost"
               size="sm"
               className="w-full justify-start text-sm"
-              onClick={() => {
-                setPopoverOpen(false);
-              }}
             >
               <Calendar className="h-4 w-4 mr-2" />
               Mark as Completed
             </Button>
+
             {/* Edit Button */}
             <Button
               variant="ghost"
@@ -185,7 +194,6 @@ function TodoListItem({
               <Edit2 className="h-4 w-4 mr-2" />
               Edit
             </Button>
-
 
             {/* Delete Button */}
             <Button

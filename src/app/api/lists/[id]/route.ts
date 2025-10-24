@@ -3,20 +3,25 @@ import { prisma } from '@/lib/prisma'
 
 export async function PUT(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     const sessionId = request.headers.get('X-Session-ID')
     if (!sessionId) {
+      console.error('PUT /api/lists/[id] - No session ID');
       return NextResponse.json(
         { error: 'Session ID is required' },
         { status: 401 }
       )
     }
 
-    const listId = parseInt(params.id)
+    const resolvedParams = await params;
+    const listId = parseInt(resolvedParams.id)
+    console.log('PUT /api/lists/[id] - List ID:', listId);
+
     const body = await request.json()
     const { name, color } = body
+    console.log('PUT /api/lists/[id] - Body:', { name, color });
 
     // Verify list exists and belongs to this session
     const existingList = await prisma.todoList.findFirst({
@@ -66,7 +71,7 @@ export async function PUT(
 
 export async function DELETE(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     const sessionId = request.headers.get('X-Session-ID')
@@ -77,7 +82,8 @@ export async function DELETE(
       )
     }
 
-    const listId = parseInt(params.id)
+    const resolvedParams = await params;
+    const listId = parseInt(resolvedParams.id)
 
     // Verify list exists and belongs to this session
     const existingList = await prisma.todoList.findFirst({
@@ -91,18 +97,6 @@ export async function DELETE(
       return NextResponse.json(
         { error: 'List not found' },
         { status: 404 }
-      )
-    }
-
-    // Check if this is the last list
-    const listCount = await prisma.todoList.count({
-      where: { sessionId }
-    })
-
-    if (listCount <= 1) {
-      return NextResponse.json(
-        { error: 'Cannot delete the last list' },
-        { status: 400 }
       )
     }
 

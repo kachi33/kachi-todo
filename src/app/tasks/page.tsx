@@ -24,6 +24,9 @@ import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
 import OfflineStatus from "@/components/OfflineStatus";
 import CreateList from "@/components/CreateList";
+import ListCard from "@/components/ListCard";
+import DeleteList from "@/components/DeleteList";
+import { TodoList } from "@/types";
 
 function Tasks(): React.JSX.Element {
   const queryClient = useQueryClient();
@@ -47,7 +50,9 @@ function Tasks(): React.JSX.Element {
   const [deleteTodo, setDeleteTodo] = useState<Todo | null>(null);
   const [currentPage, setCurrentPage] = useState<number>(1);
   const [filterModalOpen, setFilterModalOpen] = useState<boolean>(false);
-  const [createListOpen, setCreateListOpen] = useState<boolean>(false);
+  const [listModalOpen, setListModalOpen] = useState<boolean>(false);
+  const [selectedList, setSelectedList] = useState<TodoList | null>(null);
+  const [deleteList, setDeleteList] = useState<TodoList | null>(null);
   const [filters, setFilters] = useState<FilterOptions>({
     priority: [],
     status: "all",
@@ -123,16 +128,38 @@ function Tasks(): React.JSX.Element {
 
   return (
     <div className="w-full flex flex-col gap-3 lg:gap-6">
-      <section className="w-full bg-card flex flex-col gap-3 md:gap-6 lg:gap-8">
-        <Button
-          onClick={() => setCreateListOpen(true)}
-          variant="outline"
-          size="lg"
-          className="w-full border-dashed border-2 h-24 flex flex-col items-center justify-center gap-2 hover:bg-accent/50"
-        >
-          <FolderPlus className="h-8 w-8" />
-          <span className="text-sm font-medium">New List</span>
-        </Button>
+      {/* Horizontal Scrollable Lists Section */}
+      <section className="w-full">
+        <div className="flex items-center gap-4 overflow-x-auto pb-4 scrollbar-hide">
+          {/* New List Button */}
+          <div className="flex-shrink-0">
+            <Button
+              onClick={() => {
+                setSelectedList(null);
+                setListModalOpen(true);
+              }}
+              variant="outline"
+              size="lg"
+              className="w-[200px] h-[140px] border-dashed border-2 flex flex-col items-center justify-center gap-2 hover:bg-accent/50 rounded-xl"
+            >
+              <FolderPlus className="h-8 w-8" />
+              <span className="text-sm font-medium">New List</span>
+            </Button>
+          </div>
+
+          {/* List Cards */}
+          {todoLists.map((list) => (
+            <ListCard
+              key={list.id}
+              list={list}
+              onEdit={(list) => {
+                setSelectedList(list);
+                setListModalOpen(true);
+              }}
+              onDelete={setDeleteList}
+            />
+          ))}
+        </div>
       </section>
 
 {/* Main Content */}
@@ -234,8 +261,18 @@ function Tasks(): React.JSX.Element {
       )}
 
       <CreateList
-        open={createListOpen}
-        onOpenChange={setCreateListOpen}
+        list={selectedList}
+        open={listModalOpen}
+        onOpenChange={(open) => {
+          setListModalOpen(open);
+          if (!open) setSelectedList(null);
+        }}
+      />
+
+      <DeleteList
+        list={deleteList}
+        open={!!deleteList}
+        onOpenChange={(open) => !open && setDeleteList(null)}
       />
       </section>
 

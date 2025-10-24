@@ -99,7 +99,11 @@ export const updateTodoList = async (id: number, listData: Partial<CreateTodoLis
     headers,
     body: JSON.stringify(listData),
   });
-  if (!res.ok) throw new Error('Failed to update todo list');
+  if (!res.ok) {
+    const errorData = await res.json().catch(() => ({ error: 'Unknown error' }));
+    console.error('Failed to update todo list:', res.status, errorData);
+    throw new Error(`Failed to update todo list: ${errorData.error || res.statusText}`);
+  }
   return res.json();
 };
 
