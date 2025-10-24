@@ -103,12 +103,54 @@ function HomeTodoList(): React.JSX.Element {
     );
   }
 
-  // Filter for pending (incomplete) todos only
-  const pendingTodos = todos.filter((todo: Todo) => !todo.completed);
+  // Filter for pending todos and exclude overdue tasks
+  const now = new Date();
+  const pendingTodos = todos.filter((todo: Todo) => {
+    // Only include incomplete tasks
+    if (todo.completed) return false;
 
-  // Show only the first 3 pending todos
-  const recentTodos = pendingTodos.slice(0, 3);
-  const hasMoreTodos = pendingTodos.length > 3;
+    // If there's a due date, check if it's not overdue
+    if (todo.due_date) {
+      const dueDateTime = new Date(todo.due_date);
+      if (todo.due_time) {
+        const [hours, minutes] = todo.due_time.split(':');
+        dueDateTime.setHours(parseInt(hours), parseInt(minutes));
+      }
+      // Exclude if overdue (past due date)
+      if (dueDateTime < now) return false;
+    }
+
+    return true;
+  });
+
+  // Sort by due date: upcoming tasks first, then tasks without dates
+  const sortedTodos = [...pendingTodos].sort((a: Todo, b: Todo) => {
+    // If both have due dates, sort by date (earliest first)
+    if (a.due_date && b.due_date) {
+      const dateA = new Date(a.due_date);
+      const dateB = new Date(b.due_date);
+      if (a.due_time) {
+        const [hours, minutes] = a.due_time.split(':');
+        dateA.setHours(parseInt(hours), parseInt(minutes));
+      }
+      if (b.due_time) {
+        const [hours, minutes] = b.due_time.split(':');
+        dateB.setHours(parseInt(hours), parseInt(minutes));
+      }
+      return dateA.getTime() - dateB.getTime();
+    }
+
+    // Tasks with due dates come before tasks without
+    if (a.due_date && !b.due_date) return -1;
+    if (!a.due_date && b.due_date) return 1;
+
+    // Both have no due dates, maintain original order
+    return 0;
+  });
+
+  // Show only the first 3 sorted todos
+  const recentTodos = sortedTodos.slice(0, 3);
+  const hasMoreTodos = sortedTodos.length > 3;
 
   return (
     <div className="flex flex-col gap-3 lg:gap-6">
@@ -171,12 +213,11 @@ function HomeTodoList(): React.JSX.Element {
           </ul>
 
           {hasMoreTodos && (
-            <div className="pt-4 border-t border-border">
+            <div className="pt-6 border-t border-border">
               <Link href="/tasks">
                 <Button variant="outline" className="w-full" size="sm">
+                  See All Task 
                   <ArrowRight className="h-4 w-4 mr-2" />
-                  See More ({pendingTodos.length - 3} more pending task
-                  {pendingTodos.length - 3 !== 1 ? "s" : ""})
                 </Button>
               </Link>
             </div>

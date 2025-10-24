@@ -6,7 +6,6 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 import { fetchTodos, fetchTodoLists } from "@/lib/api";
 import PaginationControl from "@/components/PaginationControl";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
-import EditTodo from "@/components/EditTodo";
 import DeleteTodo from "@/components/DeleteTodo";
 import FilterModal, { FilterOptions } from "@/components/FilterModal";
 import { Todo } from "@/types";
@@ -17,8 +16,7 @@ import {
   EmptyMedia,
   EmptyTitle,
   EmptyDescription,
-  EmptyContent,
-} from "@/components/ui/empty";
+  EmptyContent} from "@/components/ui/empty";
 import { ListTodo, Plus, Filter, FolderPlus } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
@@ -58,7 +56,7 @@ function Tasks(): React.JSX.Element {
     status: "all",
     listId: null,
   });
-  const todosPerPage = 10;
+  const todosPerPage = 4;
 
   const handleUpdate = (updatedTodo: Todo): void => {
     queryClient.invalidateQueries({ queryKey: ["todos"] });
@@ -176,7 +174,7 @@ function Tasks(): React.JSX.Element {
     );
 
   return (
-    <div className="w-full flex flex-col gap-3 lg:gap-6">
+    <div className="w-full flex flex-col gap-3 lg:gap-4">
       {/* Horizontal Scrollable Lists Section */}
       <section className="w-full">
         <div className="flex items-center gap-4 overflow-x-auto pb-4 scrollbar-hide">
@@ -249,7 +247,7 @@ function Tasks(): React.JSX.Element {
               size="sm"
               className="h-6 text-xs"
             >
-              Clear All
+              Clear All 
             </Button>
             </>
           )}
@@ -276,7 +274,7 @@ function Tasks(): React.JSX.Element {
 
       {todos.length > 0 ? (
         <>
-          <ScrollArea className="h-[60vh] rounded-md">
+          <ScrollArea className="h-[40vh] p-2">
             <ul className="space-y-2">
               {paginatedTodos.map((todo) => (
                 <TodoListItem key={todo.id} todo={todo} />
@@ -285,7 +283,7 @@ function Tasks(): React.JSX.Element {
           </ScrollArea>
 
           {totalPages > 1 && (
-            <div className="mt-6 flex justify-center">
+            <div className="flex justify-center">
               <PaginationControl
                 currentPage={currentPage}
                 totalPages={totalPages}

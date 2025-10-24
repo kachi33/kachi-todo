@@ -11,10 +11,10 @@ import { PaginationControlProps } from "@/types";
 
 function PaginationControls({ currentPage, totalPages, onPageChange }: PaginationControlProps): React.JSX.Element {
   return (
-    <Pagination>
-      <PaginationContent>
+    <Pagination className="">
+      <PaginationContent className="">
         <PaginationItem>
-          <PaginationPrevious
+          <PaginationPrevious className=""
             href="#"
             onClick={(e) => {
               e.preventDefault();
@@ -31,6 +31,7 @@ function PaginationControls({ currentPage, totalPages, onPageChange }: Paginatio
                 e.preventDefault();
                 onPageChange(currentPage - 1);
               }}
+              className=""
             >
               {currentPage - 1}
             </PaginationLink>

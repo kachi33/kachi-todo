@@ -17,7 +17,7 @@ import { Todo } from "@/types";
 import { TaskItem } from "@/components/TaskItem";
 import OfflineStatus from "./OfflineStatus";
 import { Separator } from "@/components/ui/separator";
-import { deleteTodo } from "@/lib/offlineApi";
+import { deleteTodo, createTodo } from "@/lib/offlineApi";
 import { useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
 
@@ -58,6 +58,33 @@ export const Sidebar = ({
     }
   };
 
+  const handleDuplicate = async () => {
+    if (!todo) return;
+
+    try {
+      await createTodo({
+        title: `${todo.title} (Copy)`,
+        detail: todo.detail,
+        priority: todo.priority,
+        due_date: todo.due_date,
+        due_time: todo.due_time,
+        list_id: todo.list_id,
+        completed: false,
+      });
+      toast.success("Task duplicated successfully");
+
+      // Invalidate queries to refresh the list
+      await queryClient.invalidateQueries({ queryKey: ["todos"] });
+      await queryClient.invalidateQueries({ queryKey: ["todoLists"] });
+
+      // Close the sidebar
+      onClose();
+    } catch (error) {
+      toast.error("Failed to duplicate task");
+      console.error("Failed to duplicate task:", error);
+    }
+  };
+
   return (
     <Sheet open={isOpen} onOpenChange={onClose}>
       <SheetContent side="right" className="w-80 lg:w-[450px] sm:max-w-none p-4 flex flex-col h-full">
@@ -94,10 +121,7 @@ export const Sidebar = ({
                   <>
                     <button
                       className="flex items-center gap-2 px-3 py-2 text-sm hover:bg-gray-100 rounded transition-colors text-left"
-                      onClick={() => {
-                        // Handle duplicate task
-                        console.log("Duplicate task");
-                      }}
+                      onClick={handleDuplicate}
                     >
                       <Copy className="h-4 w-4" />
                       <span>Duplicate task</span>

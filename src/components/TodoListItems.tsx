@@ -6,7 +6,7 @@ import { useSidebar } from "@/contexts/SidebarContext";
 import { TodoListItemProps } from "@/types";
 import { formatDateTime } from "@/lib/dateUtils";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { fetchTodoLists, updateTodo, deleteTodo } from "@/lib/offlineApi";
+import { fetchTodoLists, updateTodo, deleteTodo, createTodo } from "@/lib/offlineApi";
 import { toast } from "sonner";
 import {
   Popover,
@@ -61,10 +61,63 @@ function TodoListItem({
     },
   });
 
+  // Mutation to duplicate todo
+  const duplicateTodoMutation = useMutation({
+    mutationFn: () =>
+      createTodo({
+        title: `${todo.title} (Copy)`,
+        detail: todo.detail,
+        priority: todo.priority,
+        due_date: todo.due_date,
+        due_time: todo.due_time,
+        list_id: todo.list_id,
+        completed: false,
+      }),
+    onSuccess: () => {
+      toast.success("Task duplicated successfully");
+      // Invalidate and refetch todos
+      queryClient.invalidateQueries({ queryKey: ["todos"] });
+      queryClient.invalidateQueries({ queryKey: ["todoLists"] });
+      setPopoverOpen(false);
+    },
+    onError: (error) => {
+      toast.error("Failed to duplicate task");
+      console.error("Failed to duplicate todo:", error);
+    },
+  });
+
+  // Mutation to toggle completion status
+  const toggleCompletionMutation = useMutation({
+    mutationFn: () => updateTodo(todo.id, { completed: !todo.completed }),
+    onSuccess: () => {
+      toast.success(
+        todo.completed
+          ? "Task marked as pending"
+          : "Task marked as completed"
+      );
+      // Invalidate and refetch todos
+      queryClient.invalidateQueries({ queryKey: ["todos"] });
+      queryClient.invalidateQueries({ queryKey: ["todoLists"] });
+      setPopoverOpen(false);
+    },
+    onError: (error) => {
+      toast.error("Failed to update task");
+      console.error("Failed to toggle completion:", error);
+    },
+  });
+
   const handleDelete = () => {
     if (confirm("Are you sure you want to move this task to trash?")) {
       deleteTodoMutation.mutate(todo.id);
     }
+  };
+
+  const handleDuplicate = () => {
+    duplicateTodoMutation.mutate();
+  };
+
+  const handleToggleCompletion = () => {
+    toggleCompletionMutation.mutate();
   };
 
   const getPriorityColor = (priority: string) => {
@@ -95,11 +148,11 @@ function TodoListItem({
         {/*list title, detail, date/time and list name */}
         <div className="flex justify-between items-start">
           <div className="flex flex-col">
-            <span className="text-sm font-medium text-card-foreground">
+            <span className={`text-sm font-medium text-card-foreground ${todo.completed ? 'line-through opacity-60' : ''}`}>
               {todo.title}
             </span>
             {todo.detail && (
-              <span className="text-xs text-muted-foreground mt-1 line-clamp-2">
+              <span className={`text-xs text-muted-foreground mt-1 line-clamp-2 ${todo.completed ? 'line-through opacity-60' : ''}`}>
                 {todo.detail}
               </span>
             )}
@@ -169,9 +222,11 @@ function TodoListItem({
               variant="ghost"
               size="sm"
               className="w-full justify-start text-sm"
+              onClick={handleDuplicate}
+              disabled={duplicateTodoMutation.isPending}
             >
               <Copy className="h-4 w-4 mr-2" />
-              Duplicate Task
+              {duplicateTodoMutation.isPending ? "Duplicating..." : "Duplicate Task"}
             </Button>
 
             {/* Mark as completed */}
@@ -179,9 +234,15 @@ function TodoListItem({
               variant="ghost"
               size="sm"
               className="w-full justify-start text-sm"
+              onClick={handleToggleCompletion}
+              disabled={toggleCompletionMutation.isPending}
             >
               <Calendar className="h-4 w-4 mr-2" />
-              Mark as Completed
+              {toggleCompletionMutation.isPending
+                ? "Updating..."
+                : todo.completed
+                ? "Mark as Pending"
+                : "Mark as Completed"}
             </Button>
 
             {/* Edit Button */}
