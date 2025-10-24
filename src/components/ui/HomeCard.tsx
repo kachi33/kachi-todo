@@ -1,39 +1,26 @@
 "use client";
 
-import { useState, useEffect } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { fetchUserStats } from "@/lib/api";
 import { ProductivityStats as StatsType } from "@/types";
 import ProgressChart from "../ProgressChart";
-import StreakCard from "../StreakCard";
 import WeeklyProductivityCard from "../WeeklyProductivityCard";
 import QuotesCard from "../QuotesCard";
 import { Skeleton } from "./skeleton";
-import {
-  Carousel,
-  CarouselContent,
-  CarouselItem,
-} from "./carousel";
+import { Button } from "./button";
+import { AlertCircle, RefreshCw } from "lucide-react";
+import { Swiper, SwiperSlide } from "swiper/react";
+import { Navigation, Pagination, Autoplay, EffectCoverflow } from "swiper/modules";
+import "swiper/css";
+import "swiper/css/navigation";
+import "swiper/css/pagination";
+import "swiper/css/effect-coverflow";
 
 const HOMECARD = () => {
-  const { data: stats, isLoading, isError } = useQuery<StatsType>({
+  const { data: stats, isLoading, isError, refetch } = useQuery<StatsType>({
     queryKey: ["userStats"],
     queryFn: fetchUserStats,
   });
-  const [api, setApi] = useState<any>();
-  const [current, setCurrent] = useState(0);
-  const [count, setCount] = useState(0);
-
-  useEffect(() => {
-    if (!api) return;
-
-    setCount(api.scrollSnapList().length);
-    setCurrent(api.selectedScrollSnap());
-
-    api.on("select", () => {
-      setCurrent(api.selectedScrollSnap());
-    });
-  }, [api]);
 
   if (isLoading) return (
     <div className="space-y-6 mb-6">
@@ -54,90 +41,133 @@ const HOMECARD = () => {
     </div>
   );
 
-  if (isError) return <div className="text-center p-4 text-destructive">Failed to load statistics</div>;
+  if (isError) return (
+    <div className="space-y-6 mb-6">
+      <div className="flex flex-col items-center justify-center p-8 bg-linear-to-br from-card to-card/80 rounded-2xl border border-destructive/50 h-full min-h-[300px]">
+        {/* Error Icon */}
+        <AlertCircle className="h-16 w-16 text-destructive mb-6" />
+
+        {/* Error Message */}
+        <h3 className="text-2xl font-bold text-foreground mb-2">
+          Failed to Load Statistics
+        </h3>
+        <p className="text-center text-muted-foreground mb-6 max-w-md">
+          We couldn't retrieve your productivity data. Please check your connection and try again.
+        </p>
+
+        {/* Retry Button */}
+        <Button
+          onClick={() => refetch()}
+          className="flex items-center gap-2"
+          variant="default"
+          size="md"
+        >
+          <RefreshCw className="h-4 w-4" />
+          Retry
+        </Button>
+      </div>
+    </div>
+  );
 
   if (!stats) return null;
 
   return (
-    <div className="space-y-6 mb-6">
-      {/* 3D Carousel Container */}
-      <div className="relative px-12">
+    <div className="space-y-2 mb-6">
+      {/* Swiper Carousel Container */}
+      <div className="relative">
         <style jsx global>{`
-          .carousel-3d .carousel-item {
-            transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
-            opacity: 0.4;
-            transform: scale(0.75);
-            filter: blur(2px);
+          /* Navigation buttons - Change color and size here */
+          .swiper-button-next,
+          .swiper-button-prev {
+            color: grey; /* Change to any color: #ff0000 for red, #00ff00 for green, etc. */
+            width: 50px; /* Change width */
+            height: 50px; /* Change height */
           }
 
-          .carousel-3d .carousel-item.is-active {
+          /* Arrow icon size */
+          .swiper-button-next::after,
+          .swiper-button-prev::after {
+            font-size: 28px; /* Change arrow icon size (default is 44px) */
+            font-weight: bold;
+          }
+
+          /* Optional: Add background to buttons */
+          .swiper-button-next,
+          .swiper-button-prev {
+            background-color: rgba(255, 255, 255, 0.1); /* Semi-transparent background */
+            border-radius: 50%; /* Make circular */
+            padding: 8px;
+          }
+
+          /* Pagination dots styling */
+          .swiper-pagination-bullet {
+            width: 8px;
+            height: 8px;
+            background: grey;
+            opacity: 0.3;
+            transition: all 0.3s;
+          }
+
+          .swiper-pagination-bullet-active {
+            width: 12px;
+            height: 12px;
+            border-radius: 4px;
+            border-radius: 50%;
+            background: grey; /* Change active dot color */
             opacity: 1;
-            transform: scale(1);
-            filter: blur(0px);
-            box-shadow: 0 0 40px rgba(34, 211, 238, 0.4),
-                        0 0 80px rgba(34, 211, 238, 0.2),
-                        0 0 120px rgba(34, 211, 238, 0.1);
           }
         `}</style>
 
-        <Carousel
-          setApi={setApi}
-          opts={{
-            align: "center",
-            loop: true,
+        <Swiper
+          modules={[Navigation, Pagination, Autoplay, EffectCoverflow]}
+          effect="coverflow"
+          grabCursor={true}
+          centeredSlides={true}
+          slidesPerView="auto"
+          coverflowEffect={{
+            rotate: 0,
+            stretch: 0,
+            depth: 100,
+            modifier: 2,
+            slideShadows: false,
           }}
-          plugins={[]}
-          className="carousel-3d w-full"
+          loop={true}
+          autoplay={{
+            delay: 20000,
+            disableOnInteraction: false,
+          }}
+          pagination={{
+            clickable: true,
+    
+          }}
+          navigation={true}
+          className="w-full m-0 text-muted-foreground"
         >
-          <CarouselContent className="-ml-4">
-            {/* Slide 1: Progress Chart */}
-            <CarouselItem className={`pl-4 carousel-item ${current === 0 ? 'is-active' : ''}`}>
-              <div className="p-1">
-                <div className="rounded-2xl overflow-hidden">
-                  <ProgressChart stats={stats} />
-                </div>
+          {/* Slide 1: Progress Chart */}
+          <SwiperSlide className=" max-w-sm ">
+            <div className="p-1">
+              <div className="bg-card border border-border rounded-2xl p-4">
+                <ProgressChart stats={stats} />
               </div>
-            </CarouselItem>
+            </div>
+          </SwiperSlide>
 
-            {/* Slide 2: Streak Card */}
-            <CarouselItem className={`pl-4 carousel-item ${current === 1 ? 'is-active' : ''}`}>
-              <div className="p-1">
-                <StreakCard streak={stats.active_streak} />
-              </div>
-            </CarouselItem>
+          {/* Slide 3: Weekly Productivity
+          <SwiperSlide className=" max-w-sm ">
+            <div className="p-1">
+              <WeeklyProductivityCard />
+            </div>
+          </SwiperSlide> */}
 
-            {/* Slide 3: Weekly Productivity */}
-            <CarouselItem className={`pl-4 carousel-item ${current === 2 ? 'is-active' : ''}`}>
-              <div className="p-1">
-                <WeeklyProductivityCard />
-              </div>
-            </CarouselItem>
-
-            {/* Slide 4: Quotes */}
-            <CarouselItem className={`pl-4 carousel-item ${current === 3 ? 'is-active' : ''}`}>
-              <div className="p-1">
-                <QuotesCard />
-              </div>
-            </CarouselItem>
-          </CarouselContent>
-        </Carousel>
-
-        {/* Carousel Navigation Dots */}
-        <div className="flex justify-center gap-2 mt-6">
-          {Array.from({ length: count }).map((_, index) => (
-            <button
-              key={index}
-              className={`h-2 rounded-full transition-all duration-300 ${
-                current === index
-                  ? 'w-8 bg-cyan-500'
-                  : 'w-2 bg-muted-foreground/30 hover:bg-muted-foreground/50'
-              }`}
-              onClick={() => api?.scrollTo(index)}
-              aria-label={`Go to slide ${index + 1}`}
-            />
-          ))}
-        </div>
+          {/* Slide 4: Quotes */}
+          <SwiperSlide className=" max-w-sm ">
+            <div className="p-1">
+              <QuotesCard />
+            </div>
+          </SwiperSlide>
+        </Swiper>
       </div>
+      
     </div>
   );
 };

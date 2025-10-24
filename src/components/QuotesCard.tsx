@@ -1,8 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { Heart, RefreshCw } from "lucide-react";
-import { Button } from "@/components/ui/button";
+import { Quote } from "lucide-react";
 import { toast } from "sonner";
 
 const MOTIVATIONAL_QUOTES = [
@@ -68,17 +67,11 @@ const QuotesCard = () => {
   };
 
   return (
-    <div className="flex flex-col items-center justify-between p-8 bg-gradient-to-br from-card to-card/80 rounded-2xl border border-border h-full min-h-[300px]">
+    <div className="flex flex-col items-center justify-between p-8 bg-linear-to-br from-card to-card/80 rounded-2xl border border-border h-full min-h-[300px]">
       {/* Quote Content */}
       <div className="flex-1 flex flex-col items-center justify-center text-center px-4">
-        <div className="mb-6">
-          <svg
-            className="w-12 h-12 text-muted-foreground/30 mb-4"
-            fill="currentColor"
-            viewBox="0 0 24 24"
-          >
-            <path d="M6 17h3l2-4V7H5v6h3zm8 0h3l2-4V7h-6v6h3z" />
-          </svg>
+        <div className="mb-4">
+          <Quote className="h-12 w-12 text-muted-foreground/30 mb-4" />
         </div>
 
         <p className={`text-2xl font-serif font-medium text-foreground mb-4 transition-opacity duration-300 ${
@@ -94,29 +87,19 @@ const QuotesCard = () => {
         </p>
       </div>
 
-      {/* Action Buttons */}
+      {/* Action Buttons
       <div className="flex items-center gap-4 mt-6">
         <Button
           variant="outline"
           size="lg"
-          className="flex items-center gap-2"
-          onClick={handleSaveQuote}
-        >
-          <Heart className={`h-5 w-5 ${isSaved ? 'fill-current text-red-500' : ''}`} />
-          Save Quote
-        </Button>
-
-        <Button
-          variant="outline"
-          size="lg"
-          className="flex items-center gap-2"
+          className="flex items-center gap-4"
           onClick={handleNewQuote}
           disabled={isRefreshing}
         >
           <RefreshCw className={`h-5 w-5 ${isRefreshing ? 'animate-spin' : ''}`} />
-          New Quote
+          Refresh
         </Button>
-      </div>
+      </div> */}
     </div>
   );
 };

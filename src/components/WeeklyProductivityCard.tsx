@@ -14,15 +14,9 @@ const WeeklyProductivityCard = ({ weeklyData }: WeeklyProductivityCardProps) => 
   const mostProductiveDayFull = fullDayNames[data.indexOf(maxValue)];
 
   return (
-    <div className="flex flex-col items-center justify-center p-8 bg-linear-to-br from-card to-card/80 rounded-2xl border border-border h-full min-h-[300px]">
-      {/* Title */}
-      <div className="flex items-center gap-2 mb-6">
-        <TrendingUp className="h-6 w-6 text-blue-500" />
-        <h2 className="text-2xl font-bold text-foreground">Weekly Activity</h2>
-      </div>
-
+    <div className="flex flex-col items-center justify-center px-2 bg-linear-to-br from-card to-card/80 rounded-2xl border border-border h-full min-h-[300px]">
       {/* Mini Chart */}
-      <div className="flex items-end gap-3 mb-8 h-32">
+      <div className="flex items-end gap-3 mb-8 h-24">
         {data.map((value, index) => {
           const height = (value / maxValue) * 100;
           const isHighest = value === maxValue;

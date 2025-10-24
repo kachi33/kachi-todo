@@ -5,15 +5,17 @@ interface ProgressChartProps {
 }
 
 const ProgressChart = ({ stats }: ProgressChartProps) => {
-  const completionPercentage = stats.total_todos > 0 ?
-    (stats.completed_todos / stats.total_todos) * 100 : 0;
+  const completionPercentage =
+    stats.total_todos > 0
+      ? (stats.completed_todos / stats.total_todos) * 100
+      : 0;
 
   return (
     <div className="space-y-4">
       {/* Completion Progress Bar */}
-      <div className="flex flex-col items-center space-y-2">
+      <div className="flex flex-col items-center space-y-4">
         <div className="relative w-32 h-32">
-          <svg className="w-32 h-32 transform -rotate-90" viewBox="0 0 36 36">
+          <svg className="w-32 h-32 transform -rotate-360" viewBox="0 0 36 36">
             {/* Background circle */}
             <path
               className="stroke-muted"
@@ -34,7 +36,7 @@ const ProgressChart = ({ stats }: ProgressChartProps) => {
                  a 15.9155 15.9155 0 0 1 0 31.831
                  a 15.9155 15.9155 0 0 1 0 -31.831"
               style={{
-                transition: 'stroke-dasharray 0.5s ease-out'
+                transition: "stroke-dasharray 0.5s ease-out",
               }}
             />
           </svg>
@@ -43,19 +45,14 @@ const ProgressChart = ({ stats }: ProgressChartProps) => {
             <div className="text-lg font-bold text-foreground">
               {stats.completed_todos}/{stats.total_todos}
             </div>
-            <div className="text-xs text-muted-foreground">
-              completed
-            </div>
           </div>
         </div>
-                <div className="text-sm text-muted-foreground">Overall Progress</div>
+        <div className=" text-muted-foreground">Overall Progress</div>
 
-                    <p className="text-muted-foreground mb-6">
-              Track your productivity and stay on top of your tasks
-            </p>
-
+        <p className="text-primary text-center max-w-xs mb-6 mt-2">
+          Track your productivity and stay on top of your tasks
+        </p>
       </div>
-
     </div>
   );
 };
