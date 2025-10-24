@@ -11,7 +11,7 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popover";
-import { Check, MoreHorizontal, Trash2, Info } from "lucide-react";
+import { Check, MoreHorizontal, Trash2, Info, Copy, WifiOff } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Todo } from "@/types";
 import { TaskItem } from "@/components/TaskItem";
@@ -33,11 +33,11 @@ export const Sidebar = ({
 
   return (
     <Sheet open={isOpen} onOpenChange={onClose}>
-      <SheetContent side="right" className="w-80 lg:w-[450px] sm:max-w-none p-0 flex flex-col h-full">
-        <SheetHeader className="px-6 pt-6 pb-4 shrink-0">
+      <SheetContent side="right" className="w-80 lg:w-[450px] sm:max-w-none p-4 flex flex-col h-full">
+        <SheetHeader className="">
           <div className="flex items-center justify-between">
             <SheetTitle className="">
-              {isEditMode ? "Edit Task" : "Add a New Task"}
+              {isEditMode ? "Update Task" : "Add a New Task"}
             </SheetTitle>
           </div>
         </SheetHeader>
@@ -61,18 +61,36 @@ export const Sidebar = ({
             </PopoverTrigger>
             <PopoverContent className="w-56 p-2" align="end" side="top">
               <div className="flex flex-col space-y-1">
-                {/* Mark as Complete */}
-                {isEditMode && !todo?.completed && (
+
+                {/* Duplicate Task */}
+                {isEditMode && (
                   <>
                     <button
                       className="flex items-center gap-2 px-3 py-2 text-sm hover:bg-gray-100 rounded transition-colors text-left"
                       onClick={() => {
-                        // Handle mark as complete
-                        console.log("Mark as complete");
+                        // Handle duplicate task
+                        console.log("Duplicate task");
                       }}
                     >
-                      <Check className="h-4 w-4" />
-                      <span>Mark as complete</span>
+                      <Copy className="h-4 w-4" />
+                      <span>Duplicate task</span>
+                    </button>
+                    <Separator className="my-1" />
+                  </>
+                )}
+
+                {/* Available Offline */}
+                {isEditMode && (
+                  <>
+                    <button
+                      className="flex items-center gap-2 px-3 py-2 text-sm hover:bg-gray-100 rounded transition-colors text-left"
+                      onClick={() => {
+                        // Handle available offline toggle
+                        console.log("Toggle available offline");
+                      }}
+                    >
+                      <WifiOff className="h-4 w-4" />
+                      <span>Available offline</span>
                     </button>
                     <Separator className="my-1" />
                   </>
@@ -89,7 +107,7 @@ export const Sidebar = ({
                       }}
                     >
                       <Trash2 className="h-4 w-4" />
-                      <span>Delete task</span>
+                      <span>Move to trash</span>
                     </button>
                     <Separator className="my-1" />
                   </>
@@ -105,7 +123,7 @@ export const Sidebar = ({
                     <div className="ml-5 space-y-0.5">
                       <p>Created: {new Date(todo.created_at).toLocaleDateString()}</p>
                       {todo.updated_at && (
-                        <p>Updated: {new Date(todo.updated_at).toLocaleDateString()}</p>
+                        <p>Last Edited at: {new Date(todo.updated_at).toLocaleDateString()}</p>
                       )}
                     </div>
                   </div>
