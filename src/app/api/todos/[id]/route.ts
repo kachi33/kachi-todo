@@ -64,7 +64,7 @@ export async function GET(
 
 export async function PUT(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     const sessionId = request.headers.get('X-Session-ID')
@@ -75,7 +75,8 @@ export async function PUT(
       )
     }
 
-    const todoId = parseInt(params.id)
+    const resolvedParams = await params;
+    const todoId = parseInt(resolvedParams.id)
     const body = await request.json()
     const { title, detail, priority, due_date, due_time, completed, list_id } = body
 
@@ -83,7 +84,7 @@ export async function PUT(
     const existingTodo = await prisma.todo.findFirst({
       where: {
         id: todoId,
-        sessionId
+        sessionId: sessionId
       }
     })
 

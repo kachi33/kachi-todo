@@ -346,14 +346,16 @@ class SyncManager {
     const localTodos = await offlineStorage.getTodos();
     const todo = localTodos.find(t => t.id === id);
 
-    if (todo) {
-      const updatedTodo = { ...todo, ...updates };
-      await offlineStorage.saveTodo(updatedTodo, true);
+    if (!todo) {
+      throw new Error(`Todo with id ${id} not found in offline storage`);
+    }
 
-      // Try to sync immediately if online
-      if (this.isOnline) {
-        this.triggerSync();
-      }
+    const updatedTodo = { ...todo, ...updates };
+    await offlineStorage.saveTodo(updatedTodo, true);
+
+    // Try to sync immediately if online
+    if (this.isOnline) {
+      this.triggerSync();
     }
   }
 

@@ -172,11 +172,14 @@ export const TaskItem = ({ todo, onSave, onClose }: TaskItemProps) => {
       }
 
       // Refresh todos
-      queryClient.invalidateQueries({ queryKey: ["todos"] });
-      queryClient.invalidateQueries({ queryKey: ["todoLists"] });
+      await queryClient.invalidateQueries({ queryKey: ["todos"] });
+      await queryClient.invalidateQueries({ queryKey: ["todoLists"] });
 
       // Call onSave callback with saved todo
       onSave?.(savedTodo);
+
+      // Small delay to ensure UI updates before closing
+      await new Promise(resolve => setTimeout(resolve, 100));
 
       // Close
       onClose?.();
