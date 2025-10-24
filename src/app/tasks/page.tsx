@@ -3,6 +3,7 @@
 import { useState, useMemo } from "react";
 import TodoListItem from "@/components/TodoListItems";
 import { ScrollArea } from "@/components/ui/scroll-area";
+import { Skeleton } from "@/components/ui/skeleton";
 import { fetchTodos, fetchTodoLists } from "@/lib/api";
 import PaginationControl from "@/components/PaginationControl";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
@@ -16,7 +17,14 @@ import {
   EmptyDescription,
   EmptyContent,
 } from "@/components/ui/empty";
-import { ListTodo, Plus, Filter, FolderPlus } from "lucide-react";
+import {
+  ListTodo,
+  Plus,
+  Filter,
+  FolderPlus,
+  AlertCircle,
+  RefreshCw,
+} from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
 import OfflineStatus from "@/components/OfflineStatus";
@@ -33,6 +41,7 @@ function Tasks(): React.JSX.Element {
     data: todos = [],
     isLoading,
     isError,
+    refetch,
   } = useQuery({
     queryKey: ["todos"],
     queryFn: () => fetchTodos(), // No list filter - get ALL todos
@@ -75,7 +84,6 @@ function Tasks(): React.JSX.Element {
     }
     setCurrentPage(1); // Reset to first page when filter changes
   };
-
 
   const handleClearAllFilters = (): void => {
     setFilters({
@@ -160,13 +168,63 @@ function Tasks(): React.JSX.Element {
 
   if (isLoading)
     return (
-      <div className="p-4 text-foreground bg-background">Loading todos...</div>
+      <div className="w-full flex flex-col gap-4">
+        {/* Skeleton for list cards */}
+        <div className="flex items-center gap-4 overflow-x-auto pb-4">
+          <Skeleton className="w-[200px] h-[140px] rounded-xl shrink-0" />
+          <Skeleton className="w-[200px] h-[140px] rounded-xl shrink-0" />
+          <Skeleton className="w-[200px] h-[140px] rounded-xl shrink-0" />
+        </div>
+
+        {/* Skeleton for header */}
+        <div className="flex items-center justify-between">
+          <Skeleton className="h-8 w-32" />
+          <Skeleton className="h-9 w-36" />
+        </div>
+
+        <Separator className="" />
+
+        <div className="flex items-center justify-end">
+          <Skeleton className="h-6 w-36" />
+        </div>
+
+        {/* Skeleton for task items */}
+        <div className="space-y-2 p-2 md:px-4">
+          <Skeleton className="h-18 w-full rounded-lg" />
+          <Skeleton className="h-18 w-full rounded-lg" />
+          <Skeleton className="h-18 w-full rounded-lg" />
+          <Skeleton className="h-18 w-full rounded-lg" />
+        </div>
+      </div>
     );
 
   if (isError)
     return (
-      <div className="p-4 text-destructive bg-background">
-        Error loading todos
+      <div className="w-full flex flex-col gap-4">
+        <div className="flex flex-col items-center justify-center p-8 bg-linear-to-br from-card to-card/80 rounded-2xl border border-destructive/50 h-full min-h-[400px]">
+          {/* Error Icon */}
+          <AlertCircle className="h-16 w-16 text-destructive mb-6" />
+
+          {/* Error Message */}
+          <h3 className="text-2xl font-bold text-foreground mb-2">
+            Failed to Load Tasks
+          </h3>
+          <p className="text-center text-muted-foreground mb-6 max-w-md">
+            We couldn't retrieve your tasks. Please check your connection and
+            try again.
+          </p>
+
+          {/* Retry Button */}
+          <Button
+            onClick={() => refetch()}
+            variant="default"
+            size="default"
+            className="flex items-center gap-2"
+          >
+            <RefreshCw className="h-4 w-4" />
+            Retry
+          </Button>
+        </div>
       </div>
     );
 
@@ -208,7 +266,7 @@ function Tasks(): React.JSX.Element {
       </section>
 
       {/* Main Content */}
-      <section className="w-full flex flex-col gap-3 lg:gap-6">
+      <section className="w-full flex flex-col gap-2 ">
         {/* Header */}
         <div className="flex items-center  justify-between">
           <h1 className="md:text-2xl text-xl font-bold text-foreground">
@@ -227,7 +285,8 @@ function Tasks(): React.JSX.Element {
           </div>
         </div>
 
-        <Separator className=""  />
+        <Separator className="" />
+        {/* filters and them */}
         <div className="text-muted-foreground flex items-center justify-between">
           <div className="flex items-center gap-2">
             {/* filter text */}
@@ -267,7 +326,7 @@ function Tasks(): React.JSX.Element {
 
         {todos.length > 0 ? (
           <>
-            <ScrollArea className="h-[40vh] p-2">
+            <ScrollArea className="h-[40vh] p-2 md:px-4">
               <ul className="space-y-2">
                 {paginatedTodos.map((todo) => (
                   <TodoListItem key={todo.id} todo={todo} />
