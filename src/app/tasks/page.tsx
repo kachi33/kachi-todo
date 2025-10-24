@@ -80,6 +80,55 @@ function Tasks(): React.JSX.Element {
     setCurrentPage(1); // Reset to first page when filters change
   };
 
+  const handleListClick = (list: TodoList): void => {
+    // Toggle behavior: if clicked list is already active, clear filter
+    if (filters.listId === list.id) {
+      setFilters({ ...filters, listId: null });
+    } else {
+      setFilters({ ...filters, listId: list.id });
+    }
+    setCurrentPage(1); // Reset to first page when filter changes
+  };
+
+  const handleClearAllFilters = (): void => {
+    setFilters({
+      priority: [],
+      status: "all",
+      listId: null,
+    });
+    setCurrentPage(1);
+  };
+
+  // Check if any filters are active
+  const hasActiveFilters = useMemo(() => {
+    return filters.listId !== null || filters.priority.length > 0 || filters.status !== "all";
+  }, [filters]);
+
+  // Generate active filter text
+  const activeFiltersText = useMemo(() => {
+    const filterTexts: string[] = [];
+
+    // List filter
+    if (filters.listId !== null) {
+      const activeList = todoLists.find((list) => list.id === filters.listId);
+      if (activeList) {
+        filterTexts.push(`List: ${activeList.name}`);
+      }
+    }
+
+    // Priority filter
+    if (filters.priority.length > 0) {
+      filterTexts.push(`Priority: ${filters.priority.join(", ")}`);
+    }
+
+    // Status filter
+    if (filters.status !== "all") {
+      filterTexts.push(`Status: ${filters.status.charAt(0).toUpperCase() + filters.status.slice(1)}`);
+    }
+
+    return filterTexts.length > 0 ? filterTexts.join(" • ") : "None";
+  }, [filters, todoLists]);
+
   // Apply filters to todos
   const filteredTodos = useMemo(() => {
     return todos.filter((todo) => {
@@ -157,6 +206,8 @@ function Tasks(): React.JSX.Element {
                 setListModalOpen(true);
               }}
               onDelete={setDeleteList}
+              onClick={handleListClick}
+              isActive={filters.listId === list.id}
             />
           ))}
         </div>
@@ -183,9 +234,28 @@ function Tasks(): React.JSX.Element {
         </div>
       </div>
 
-      <div className="text-muted-foreground">
         <Separator className="" />
-        <div className="flex justify-end mt-2 gap-3">
+      <div className="text-muted-foreground flex items-center justify-between">
+        <div className="flex items-center gap-2">
+        {/* filter text */}
+          {hasActiveFilters && (
+        <>
+          <p className="text-sm">
+            {activeFiltersText}
+          </p>
+            <Button
+              onClick={handleClearAllFilters}
+              variant="ghost"
+              size="sm"
+              className="h-6 text-xs"
+            >
+              Clear All
+            </Button>
+            </>
+          )}
+          </div>
+
+        <div className="flex justify-end items-center gap-3">
           <OfflineStatus />
           <FilterModal
             open={filterModalOpen}

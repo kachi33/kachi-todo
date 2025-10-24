@@ -15,13 +15,17 @@ interface ListCardProps {
   onEdit: (list: TodoList) => void;
   onDelete: (list: TodoList) => void;
   onClick?: (list: TodoList) => void;
+  isActive?: boolean;
 }
 
-export default function ListCard({ list, onEdit, onDelete, onClick }: ListCardProps) {
+export default function ListCard({ list, onEdit, onDelete, onClick, isActive }: ListCardProps) {
   return (
     <div
-      className="relative shrink-0 w-[200px] h-[140px] rounded-xl p-4 cursor-pointer transition-all hover:scale-105 hover:shadow-lg"
+      className={`relative shrink-0 w-[200px] h-[140px] rounded-xl p-4 cursor-pointer transition-all hover:scale-105 hover:shadow-lg ${
+        isActive ? "ring-4 ring-white/50" : ""
+      }`}
       style={{ backgroundColor: list.color || "#3B82F6" }}
+      onClick={() => onClick?.(list)}
     >
       {/* More Options */}
       <div className="absolute top-2 right-2 z-10" onClick={(e) => e.stopPropagation()}>

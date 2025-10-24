@@ -8,6 +8,7 @@ import ThemeToggle from '@/components/ThemeToggle'
 import SidebarWrapper from '@/components/SidebarWrapper'
 import { Toaster } from "@/components/ui/sonner"
 import { Footer } from 'react-day-picker'
+import Link from 'next/link'
 
 
 export const metadata: Metadata = {
@@ -28,9 +29,11 @@ export default function RootLayout({
             <SidebarProvider>
               <main className="min-h-screen bg-background transition-colors">
                 <header className="flex justify-between items-center p-4 md:p-6 lg:px-20 lg:py-12">
+                  <Link href="/">
                   <h1 className="md:text-2xl font-kaushan text-xl font-bold text-foreground">
                     Kachi's <span className="text-amber-700 text-3xl">ToDo</span>
                   </h1>
+                  </Link>
                   <div className="flex items-center gap-2">
                     <ThemeToggle />
                   </div>
