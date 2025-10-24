@@ -127,10 +127,6 @@
   }
 }
 
-body {
-  font-family: 'Quicksand', sans-serif;
-}
-
 /* Hide scrollbar for horizontal scrolling */
 .scrollbar-hide {
   -ms-overflow-style: none;

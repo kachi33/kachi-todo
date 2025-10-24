@@ -9,6 +9,9 @@ import SidebarWrapper from '@/components/SidebarWrapper'
 import { Toaster } from "@/components/ui/sonner"
 import { Footer } from 'react-day-picker'
 import Link from 'next/link'
+import { Inter } from 'next/font/google'
+
+const inter = Inter({ subsets: ['latin'] })
 
 
 export const metadata: Metadata = {
@@ -23,7 +26,7 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en" suppressHydrationWarning>
-      <body>
+      <body className={inter.className}>
         <QueryProvider>
           <ThemeProvider>
             <SidebarProvider>
