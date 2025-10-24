@@ -10,10 +10,10 @@ import { Label } from "@/components/ui/label";
 import { Select, SelectItem } from "@/components/ui/select";
 import { Switch } from "@/components/ui/switch.jsx";
 import {
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
-} from "@/components/ui/popover";
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 
 interface EnhancedCalendarProps {
   date?: Date;
@@ -209,8 +209,8 @@ export function EnhancedCalendar({
         <Calendar1 className="inline mr-1 h-4 w-4" />
         Due
       </Label>
-      <Popover open={open} onOpenChange={setOpen}>
-        <PopoverTrigger asChild className="flex-1">
+      <DropdownMenu open={open} onOpenChange={setOpen}>
+        <DropdownMenuTrigger asChild className="flex-1">
           <Button
             variant="ghost"
             size="default"
@@ -219,8 +219,8 @@ export function EnhancedCalendar({
           >
             {formatDateDisplay(date, startTime, endTime, endDate)}
           </Button>
-        </PopoverTrigger>
-        <PopoverContent className="w-auto p-0" align="start">
+        </DropdownMenuTrigger>
+        <DropdownMenuContent className="w-auto p-0" align="start">
           <div className="flex flex-col">
             {/* Calendar */}
             <Calendar
@@ -367,8 +367,8 @@ export function EnhancedCalendar({
               )}
             </div>
           </div>
-        </PopoverContent>
-      </Popover>
+        </DropdownMenuContent>
+      </DropdownMenu>
     </div>
   );
 }

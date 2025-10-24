@@ -156,7 +156,7 @@ function HomeTodoList(): React.JSX.Element {
     <div className="flex flex-col gap-3 lg:gap-6">
       <div className="flex items-center  justify-between">
         <h2 className="text-xl font-semibold text-card-foreground">
-          Pending Tasks
+          Upcoming Tasks
         </h2>
         <div className="flex justify-between items-center gap-2">
           <Button
