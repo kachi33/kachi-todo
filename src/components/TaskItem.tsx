@@ -196,7 +196,7 @@ export const TaskItem = ({ todo, onSave, onClose }: TaskItemProps) => {
   };
 
   return (
-    <div className="space-y-4 px-6">
+    <div className="space-y-4">
       {/* Title */}
       <div className="space-y-2">
         <Label htmlFor="title" className=""></Label>
@@ -345,7 +345,6 @@ export const TaskItem = ({ todo, onSave, onClose }: TaskItemProps) => {
         </div>
 
             </div>
-            <Separator className="mb-2" />
       {/* Save Button - Only show when there are changes */}
       {hasChanges && (
         <div className="flex gap-3 pt-4">
@@ -363,8 +362,7 @@ export const TaskItem = ({ todo, onSave, onClose }: TaskItemProps) => {
               </>
             ) : (
               <>
-                <Save className="h-4 w-4 mr-2" />
-                {isEditMode ? "Save Changes" : "Create Todo"}
+                {isEditMode ? "Save Changes" : "Add Task"}
               </>
             )}
           </Button>
