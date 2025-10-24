@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
-import { Calendar, ArrowRight, Plus, Divide, ListTodo } from "lucide-react";
+import { Calendar, ArrowRight, Plus, Divide, ListTodo, AlertCircle, RefreshCw } from "lucide-react";
 import {
   Empty,
   EmptyHeader,
@@ -27,6 +27,7 @@ function HomeTodoList(): React.JSX.Element {
     data: todos = [],
     isLoading,
     isError,
+    refetch,
   } = useQuery({
     queryKey: ["todos"],
     queryFn: () => fetchTodos(),
@@ -94,11 +95,53 @@ function HomeTodoList(): React.JSX.Element {
 
   if (isError) {
     return (
-      <div className="bg-card border border-border rounded-lg p-6">
-        <h2 className="text-xl font-semibold text-card-foreground mb-4">
-          Recent Tasks
-        </h2>
-        <div className="text-destructive">Error loading todos</div>
+      <div className="flex flex-col gap-3 lg:gap-6">
+        <div className="flex items-center justify-between">
+          <h2 className="text-xl font-semibold text-card-foreground">
+            Upcoming Tasks
+          </h2>
+          <div className="flex justify-between items-center gap-2">
+            <Button
+              variant="outline"
+              size="lg"
+              className="cursor-pointer"
+              onClick={openCreateMode}
+              title="Create new todo"
+            >
+              <Plus className="h-4 w-4" />
+              Add New Task
+            </Button>
+          </div>
+        </div>
+        <div className="text-muted-foreground">
+          <Separator className="" />
+          <div className="flex justify-end mt-2">
+            <OfflineStatus />
+          </div>
+        </div>
+        <div className="flex flex-col items-center justify-center p-8 bg-linear-to-br from-card to-card/80 rounded-2xl border border-destructive/50 h-full min-h-[300px]">
+          {/* Error Icon */}
+          <AlertCircle className="h-16 w-16 text-destructive mb-6" />
+
+          {/* Error Message */}
+          <h3 className="text-2xl font-bold text-foreground mb-2">
+            Failed to Load Tasks
+          </h3>
+          <p className="text-center text-muted-foreground mb-6 max-w-md">
+            We couldn't retrieve your tasks. Please check your connection and try again.
+          </p>
+
+          {/* Retry Button */}
+          <Button
+            onClick={() => refetch()}
+            variant="default"
+            size="default"
+            className="flex items-center gap-2"
+          >
+            <RefreshCw className="h-4 w-4" />
+            Retry
+          </Button>
+        </div>
       </div>
     );
   }
