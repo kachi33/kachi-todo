@@ -55,15 +55,17 @@ function EditTodo({ todo, onUpdate, open, onOpenChange }: EditTodoProps): React.
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="sm:max-w-[425px]">
         <form onSubmit={handleSubmit}>
-          <DialogHeader>
-            <DialogTitle>Edit Todo</DialogTitle>
-            <DialogDescription>Update your task details.</DialogDescription>
+          <DialogHeader className="">
+            <DialogTitle className="">Edit Todo</DialogTitle>
+            <DialogDescription className="">Update your task details.</DialogDescription>
           </DialogHeader>
 
           <div className="grid gap-4 py-4">
             <div className="grid gap-2">
-              <Label htmlFor="edit-title">Title</Label>
+              <Label className="" htmlFor="edit-title">Title</Label>
               <Input
+                type="text"
+                className=""
                 id="edit-title"
                 value={title}
                 onChange={(e) => setTitle(e.target.value)}
@@ -80,18 +82,18 @@ function EditTodo({ todo, onUpdate, open, onOpenChange }: EditTodoProps): React.
                 onChange={(e) => setCompleted(e.target.checked)}
                 disabled={isLoading}
               />
-              <Label htmlFor="edit-completed">Mark as completed</Label>
+              <Label className="" htmlFor="edit-completed">Mark as completed</Label>
             </div>
             {error && <p className="text-red-600">{error}</p>}
           </div>
 
           <DialogFooter className="flex justify-end gap-2">
             <DialogClose asChild>
-              <Button type="button" variant="outline" disabled={isLoading}>
+              <Button type="button" variant="outline" size="default" className="" disabled={isLoading}>
                 Cancel
               </Button>
             </DialogClose>
-            <Button type="submit" disabled={isLoading}>
+            <Button type="submit" variant="default" size="default" className="" disabled={isLoading}>
               {isLoading ? "Updating..." : "Update Todo"}
             </Button>
           </DialogFooter>

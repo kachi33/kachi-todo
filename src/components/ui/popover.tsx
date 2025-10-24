@@ -20,6 +20,11 @@ function PopoverContent({
   align = "center",
   sideOffset = 4,
   ...props
+}: {
+  className?: string;
+  align?: "start" | "center" | "end";
+  sideOffset?: number;
+  [key: string]: any;
 }) {
   return (
     <PopoverPrimitive.Portal>

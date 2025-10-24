@@ -14,7 +14,7 @@ const WeeklyProductivityCard = ({ weeklyData }: WeeklyProductivityCardProps) => 
   const mostProductiveDayFull = fullDayNames[data.indexOf(maxValue)];
 
   return (
-    <div className="flex flex-col items-center justify-center p-8 bg-gradient-to-br from-card to-card/80 rounded-2xl border border-border h-full min-h-[300px]">
+    <div className="flex flex-col items-center justify-center p-8 bg-linear-to-br from-card to-card/80 rounded-2xl border border-border h-full min-h-[300px]">
       {/* Title */}
       <div className="flex items-center gap-2 mb-6">
         <TrendingUp className="h-6 w-6 text-blue-500" />
@@ -34,8 +34,8 @@ const WeeklyProductivityCard = ({ weeklyData }: WeeklyProductivityCardProps) => 
                 <div
                   className={`w-full rounded-t-lg transition-all duration-300 ${
                     isHighest
-                      ? 'bg-gradient-to-t from-blue-500 to-blue-400'
-                      : 'bg-gradient-to-t from-muted-foreground/40 to-muted-foreground/20'
+                      ? 'bg-linear-to-t from-blue-500 to-blue-400'
+                      : 'bg-linear-to-t from-muted-foreground/40 to-muted-foreground/20'
                   }`}
                   style={{ height: `${height}%` }}
                 />

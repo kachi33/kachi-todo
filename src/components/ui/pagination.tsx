@@ -45,6 +45,11 @@ function PaginationLink({
   isActive,
   size = "icon",
   ...props
+}: {
+  className?: string;
+  isActive?: boolean;
+  size?: "default" | "sm" | "lg" | "icon";
+  [key: string]: any;
 }) {
   return (
     <a

@@ -218,10 +218,10 @@ function FilterModal({
         </div>
 
         <div className="flex justify-between gap-3 p-4 border-t">
-          <Button variant="outline" onClick={handleReset} className="flex-1">
+          <Button variant="outline" size="default" onClick={handleReset} className="flex-1">
             Reset
           </Button>
-          <Button onClick={handleApply} className="flex-1">
+          <Button variant="default" size="default" onClick={handleApply} className="flex-1">
             Apply Filters
           </Button>
         </div>

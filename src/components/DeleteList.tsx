@@ -47,16 +47,16 @@ export default function DeleteList({ list, open, onOpenChange }: DeleteListProps
 
   return (
     <AlertDialog open={open} onOpenChange={onOpenChange}>
-      <AlertDialogContent>
-        <AlertDialogHeader>
-          <AlertDialogTitle>Are you sure?</AlertDialogTitle>
-          <AlertDialogDescription>
+      <AlertDialogContent className="">
+        <AlertDialogHeader className="">
+          <AlertDialogTitle className="">Are you sure?</AlertDialogTitle>
+          <AlertDialogDescription className="">
             This will permanently delete the list "{list.name}" and all its tasks.
             This action cannot be undone.
           </AlertDialogDescription>
         </AlertDialogHeader>
-        <AlertDialogFooter>
-          <AlertDialogCancel disabled={deleteMutation.isPending}>
+        <AlertDialogFooter className="">
+          <AlertDialogCancel className="" disabled={deleteMutation.isPending}>
             Cancel
           </AlertDialogCancel>
           <AlertDialogAction

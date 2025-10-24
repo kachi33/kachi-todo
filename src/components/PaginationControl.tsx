@@ -14,7 +14,8 @@ function PaginationControls({ currentPage, totalPages, onPageChange }: Paginatio
     <Pagination className="">
       <PaginationContent className="">
         <PaginationItem>
-          <PaginationPrevious className=""
+          <PaginationPrevious
+            className=""
             href="#"
             onClick={(e) => {
               e.preventDefault();
@@ -27,6 +28,7 @@ function PaginationControls({ currentPage, totalPages, onPageChange }: Paginatio
           <PaginationItem>
             <PaginationLink
               href="#"
+              isActive={false}
               onClick={(e) => {
                 e.preventDefault();
                 onPageChange(currentPage - 1);
@@ -39,7 +41,7 @@ function PaginationControls({ currentPage, totalPages, onPageChange }: Paginatio
         )}
 
         <PaginationItem>
-          <PaginationLink href="#" isActive>
+          <PaginationLink href="#" isActive className="">
             {currentPage}
           </PaginationLink>
         </PaginationItem>
@@ -48,10 +50,12 @@ function PaginationControls({ currentPage, totalPages, onPageChange }: Paginatio
           <PaginationItem>
             <PaginationLink
               href="#"
+              isActive={false}
               onClick={(e) => {
                 e.preventDefault();
                 onPageChange(currentPage + 1);
               }}
+              className=""
             >
               {currentPage + 1}
             </PaginationLink>
@@ -60,12 +64,13 @@ function PaginationControls({ currentPage, totalPages, onPageChange }: Paginatio
 
         {totalPages > currentPage + 1 && (
           <PaginationItem>
-            <PaginationEllipsis />
+            <PaginationEllipsis className="" />
           </PaginationItem>
         )}
 
         <PaginationItem>
           <PaginationNext
+            className=""
             href="#"
             onClick={(e) => {
               e.preventDefault();

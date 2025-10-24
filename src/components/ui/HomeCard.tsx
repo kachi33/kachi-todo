@@ -86,6 +86,7 @@ const HOMECARD = () => {
             align: "center",
             loop: true,
           }}
+          plugins={[]}
           className="carousel-3d w-full"
         >
           <CarouselContent className="-ml-4">

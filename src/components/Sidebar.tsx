@@ -162,20 +162,7 @@ export const Sidebar = ({
                 )}
 
                 {/* Metadata */}
-                {isEditMode && todo && (
-                  <div className="px-3 py-2 text-xs text-gray-500 space-y-1">
-                    <div className="flex items-center gap-2">
-                      <Info className="h-3 w-3" />
-                      <span>Metadata</span>
-                    </div>
-                    <div className="ml-5 space-y-0.5">
-                      <p>Created: {new Date(todo.created_at).toLocaleDateString()}</p>
-                      {todo.updated_at && (
-                        <p>Last Edited at: {new Date(todo.updated_at).toLocaleDateString()}</p>
-                      )}
-                    </div>
-                  </div>
-                )}
+                {/* Metadata section - created_at and updated_at not available in Todo type */}
               </div>
             </PopoverContent>
           </Popover>

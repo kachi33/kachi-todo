@@ -104,7 +104,7 @@ const ProductivityStats = () => {
       </div>
 
       {/* Active Streak */}
-      <div className="bg-gradient-to-r from-purple-500/10 to-pink-500/10 border border-border rounded-lg p-4 text-center">
+      <div className="bg-linear-to-r from-purple-500/10 to-pink-500/10 border border-border rounded-lg p-4 text-center">
           <span className="text-3xl">🔥</span>
           <span className="text-2xl font-bold text-foreground ml-2">{stats.active_streak}</span>
           Day{stats.active_streak !== 1 ? 's' : ''} Active Streak

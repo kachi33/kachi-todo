@@ -15,7 +15,7 @@ function ScrollArea({
         className="focus-visible:ring-ring/50 size-full rounded-[inherit] transition-[color,box-shadow] outline-none focus-visible:ring-[3px] focus-visible:outline-1">
         {children}
       </ScrollAreaPrimitive.Viewport>
-      <ScrollBar />
+      <ScrollBar className="" />
       <ScrollAreaPrimitive.Corner />
     </ScrollAreaPrimitive.Root>
   );
@@ -25,6 +25,10 @@ function ScrollBar({
   className,
   orientation = "vertical",
   ...props
+}: {
+  className?: string;
+  orientation?: "vertical" | "horizontal";
+  [key: string]: any;
 }) {
   return (
     <ScrollAreaPrimitive.ScrollAreaScrollbar

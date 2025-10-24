@@ -29,7 +29,7 @@ function Calendar({
     <DayPicker
       showOutsideDays={showOutsideDays}
       className={cn(
-        "bg-background group/calendar p-3 [--cell-size:--spacing(8)] [[data-slot=card-content]_&]:bg-transparent [[data-slot=popover-content]_&]:bg-transparent",
+        "bg-background group/calendar p-3 [--cell-size:--spacing(8)] data-[slot=card-content]:bg-transparent data-[slot=popover-content]:bg-transparent",
         String.raw`rtl:**:[.rdp-button\_next>svg]:rotate-180`,
         String.raw`rtl:**:[.rdp-button\_previous>svg]:rotate-180`,
         className
@@ -137,7 +137,7 @@ function Calendar({
   );
 }
 
-import type { DayModifiers, DayClickEventHandler } from "react-day-picker";
+import type { Modifiers, DayClickEventHandler, CalendarDay } from "react-day-picker";
 
 function CalendarDayButton({
   className,
@@ -145,8 +145,8 @@ function CalendarDayButton({
   modifiers,
   ...props
 }: React.ButtonHTMLAttributes<HTMLButtonElement> & {
-  day: Date;
-  modifiers: DayModifiers;
+  day: CalendarDay;
+  modifiers: Modifiers;
 }) {
   const defaultClassNames = getDefaultClassNames()
 

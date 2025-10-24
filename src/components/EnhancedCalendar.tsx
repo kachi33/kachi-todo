@@ -242,6 +242,7 @@ export function EnhancedCalendar({
                 <div className="flex items-center justify-between">
                   <Label className="text-sm">Set time</Label>
                   <Switch
+                    className=""
                     checked={showTimeSelector}
                     onCheckedChange={(checked) => {
                       setShowTimeSelector(checked);

@@ -140,6 +140,7 @@ export default function CreateList({
                 List Name
               </Label>
               <Input
+                type="text"
                 id="name"
                 placeholder="e.g., Personal, Work, Shopping"
                 value={name}
@@ -172,13 +173,14 @@ export default function CreateList({
             <Button
               type="button"
               variant="outline"
+              size="default"
               onClick={handleClose}
               disabled={isPending}
               className=""
             >
               Cancel
             </Button>
-            <Button type="submit" disabled={isPending} className="">
+            <Button type="submit" variant="default" size="default" disabled={isPending} className="">
               {isPending
                 ? isEditMode
                   ? "Updating..."

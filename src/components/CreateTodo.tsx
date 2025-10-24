@@ -50,7 +50,7 @@ function CreateTodo({ onCreate, selectedListId }: CreateTodoPropsWithList): Reac
   return (
     <Dialog>
       <DialogTrigger asChild>
-        <Button disabled={isLoading}>
+        <Button variant="default" size="default" className="" disabled={isLoading}>
                 <CirclePlus />
 
           Add New
@@ -58,15 +58,17 @@ function CreateTodo({ onCreate, selectedListId }: CreateTodoPropsWithList): Reac
       </DialogTrigger>
       <DialogContent className="sm:max-w-[425px]">
         <form onSubmit={handleSubmit}>
-          <DialogHeader>
-            <DialogTitle>Create Todo</DialogTitle>
-            <DialogDescription>Add a new task to your todo list.</DialogDescription>
+          <DialogHeader className="">
+            <DialogTitle className="">Create Todo</DialogTitle>
+            <DialogDescription className="">Add a new task to your todo list.</DialogDescription>
           </DialogHeader>
 
           <div className="grid gap-4 py-4">
             <div className="grid gap-2">
-              <Label htmlFor="title">Title</Label>
+              <Label className="" htmlFor="title">Title</Label>
               <Input
+                type="text"
+                className=""
                 id="title"
                 value={title}
                 onChange={(e) => setTitle(e.target.value)}
@@ -80,11 +82,11 @@ function CreateTodo({ onCreate, selectedListId }: CreateTodoPropsWithList): Reac
 
           <DialogFooter className="flex justify-end gap-2">
             <DialogClose asChild>
-              <Button type="button" variant="outline" disabled={isLoading}>
+              <Button type="button" variant="outline" size="default" className="" disabled={isLoading}>
                 Cancel
               </Button>
             </DialogClose>
-            <Button type="submit" disabled={isLoading}>
+            <Button type="submit" variant="default" size="default" className="" disabled={isLoading}>
               {isLoading ? "Adding..." : "Add Todo"}
             </Button>
           </DialogFooter>

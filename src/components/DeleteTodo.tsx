@@ -41,9 +41,9 @@ function DeleteTodo({ todo, onDelete, open, onOpenChange }: DeleteTodoProps): Re
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="sm:max-w-[425px]">
-        <DialogHeader>
-          <DialogTitle>Delete Todo</DialogTitle>
-          <DialogDescription>
+        <DialogHeader className="">
+          <DialogTitle className="">Delete Todo</DialogTitle>
+          <DialogDescription className="">
             Are you sure you want to delete "{todo.title}"? This action cannot be undone.
           </DialogDescription>
         </DialogHeader>
@@ -52,13 +52,15 @@ function DeleteTodo({ todo, onDelete, open, onOpenChange }: DeleteTodoProps): Re
 
         <DialogFooter className="flex justify-end gap-2">
           <DialogClose asChild>
-            <Button type="button" variant="outline" disabled={isLoading}>
+            <Button type="button" variant="outline" size="default" className="" disabled={isLoading}>
               Cancel
             </Button>
           </DialogClose>
           <Button
             type="button"
             variant="destructive"
+            size="default"
+            className=""
             onClick={handleDelete}
             disabled={isLoading}
           >
