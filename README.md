@@ -2,44 +2,44 @@
 
 A modern, full-featured Todo List application built with **Next.js 16**, **TypeScript**, **PostgreSQL**, and **Prisma**. Features include todo lists, task management, filtering, dark mode, offline support, and productivity tracking.
 
-## 🚀 Live Demo
+## Live Demo
 
 [Kachi-todo-app](https://kachi-todo.netlify.app/)
 
-## ✨ Features
+##  Features
 
 ### Core Features
-- **📝 Task Management** - Create, edit, delete, and organize todos
-- **📋 Custom Lists** - Organize todos into custom lists with color coding
-- **🎯 Priority Levels** - Set task priorities (urgent, high, medium, low)
-- **📅 Due Dates & Times** - Schedule tasks with specific dates and times
-- **✅ Task Completion** - Mark tasks as complete/incomplete
-- **🔍 Advanced Filtering** - Filter by priority, status, and list
-- **📊 Pagination** - Clean pagination for large task lists
+- ** Task Management** - Create, edit, delete, and organize todos
+- ** Custom Lists** - Organize todos into custom lists with color coding
+- ** Priority Levels** - Set task priorities (urgent, high, medium, low)
+- ** Due Dates & Times** - Schedule tasks with specific dates and times
+- ** Task Completion** - Mark tasks as complete/incomplete
+- ** Advanced Filtering** - Filter by priority, status, and list
+- ** Pagination** - Clean pagination for large task lists
 
 ### UI/UX Features
-- **🌓 Dark Mode** - Toggle between light and dark themes
-- **📱 Responsive Design** - Optimized for all screen sizes
-- **💨 Fast & Smooth** - Built with Next.js for optimal performance
-- **🎨 Modern UI** - Beautiful interface using Tailwind CSS and ShadCN UI
-- **📴 Offline Support** - PWA with offline capabilities
-- **⚡ Optimistic Updates** - Instant UI feedback using TanStack Query
+- ** Dark Mode** - Toggle between light and dark themes
+- ** Responsive Design** - Optimized for all screen sizes
+- ** Fast & Smooth** - Built with Next.js for optimal performance
+- ** Modern UI** - Beautiful interface using Tailwind CSS and ShadCN UI
+- ** Offline Support** - PWA with offline capabilities
+- ** Optimistic Updates** - Instant UI feedback using TanStack Query
 
 ### Productivity Features
-- **📈 Productivity Stats** - Track completed vs pending tasks
-- **📊 Weekly Overview** - Visual progress tracking
-- **⏰ Upcoming Tasks** - Dashboard view of tasks due soon
-- **🎯 Overdue Tracking** - Identify overdue tasks
-- **💬 Motivational Quotes** - Inspiring quotes on the dashboard
+- ** Productivity Stats** - Track completed vs pending tasks
+- ** Weekly Overview** - Visual progress tracking
+- ** Upcoming Tasks** - Dashboard view of tasks due soon
+- ** Overdue Tracking** - Identify overdue tasks
+- ** Motivational Quotes** - Inspiring quotes on the dashboard
 
 ### Technical Features
-- **🔐 Session Management** - Session-based task isolation
-- **🗄️ PostgreSQL Database** - Reliable data persistence with Prisma ORM
-- **🚀 Server-Side Rendering** - Fast initial page loads with Next.js
-- **♿ Accessible** - WCAG compliant components
-- **🎭 Error Boundaries** - Graceful error handling with retry capabilities
+- ** Session Management** - Session-based task isolation
+- ** PostgreSQL Database** - Reliable data persistence with Prisma ORM
+- ** Server-Side Rendering** - Fast initial page loads with Next.js
+- ** Accessible** - WCAG compliant components
+- ** Error Boundaries** - Graceful error handling with retry capabilities
 
-## 🛠️ Tech Stack
+##  Tech Stack
 
 ### Frontend
 - **Next.js 16** - React framework with App Router
@@ -68,7 +68,7 @@ A modern, full-featured Todo List application built with **Next.js 16**, **TypeS
 - **sonner** - Toast notifications
 - **react-day-picker** - Date picker component
 
-## 📦 Installation & Setup
+##  Installation & Setup
 
 ### Prerequisites
 - Node.js 18+ installed
@@ -126,7 +126,7 @@ npm run dev
 
 Open [http://localhost:3000](http://localhost:3000) in your browser.
 
-## 🏗️ Build & Deploy
+##  Build & Deploy
 
 ### Build for Production
 
@@ -152,94 +152,8 @@ npm run type-check
 npm run lint
 ```
 
-## 📁 Project Structure
 
-```
-kachi-todo/
-├── prisma/
-│   ├── schema.prisma           # Database schema
-│   └── migrations/             # Database migrations
-├── public/                     # Static assets
-├── src/
-│   ├── app/
-│   │   ├── layout.tsx         # Root layout
-│   │   ├── page.tsx           # Home page
-│   │   ├── tasks/
-│   │   │   └── page.tsx       # Tasks page
-│   │   └── not-found.tsx      # 404 page
-│   ├── components/
-│   │   ├── ui/                # ShadCN UI components
-│   │   ├── CreateTodo.tsx     # Todo creation modal
-│   │   ├── EditTodo.tsx       # Todo edit modal
-│   │   ├── DeleteTodo.tsx     # Todo delete confirmation
-│   │   ├── CreateList.tsx     # List creation/edit modal
-│   │   ├── DeleteList.tsx     # List delete confirmation
-│   │   ├── ListCard.tsx       # List display card
-│   │   ├── TodoListItems.tsx  # Individual todo item
-│   │   ├── HomeTodoList.tsx   # Dashboard todo list
-│   │   ├── FilterModal.tsx    # Filter options modal
-│   │   ├── PaginationControl.tsx
-│   │   ├── ProductivityStats.tsx
-│   │   ├── ProgressChart.tsx
-│   │   ├── WeeklyProductivityCard.tsx
-│   │   ├── QuotesCard.tsx
-│   │   ├── Sidebar.tsx        # Navigation sidebar
-│   │   ├── ThemeToggle.tsx    # Dark mode toggle
-│   │   ├── OfflineStatus.tsx  # Network status indicator
-│   │   └── ErrorBoundary.tsx  # Error handling
-│   ├── contexts/
-│   │   ├── SidebarContext.tsx # Sidebar state management
-│   │   └── ThemeContext.tsx   # Theme state management
-│   ├── lib/
-│   │   ├── api.ts             # API functions
-│   │   ├── offlineApi.ts      # Offline fallback API
-│   │   ├── dateUtils.ts       # Date utilities
-│   │   └── utils.ts           # General utilities
-│   ├── providers/
-│   │   └── QueryProvider.tsx  # TanStack Query provider
-│   └── types/
-│       └── index.ts           # TypeScript type definitions
-├── .env                        # Environment variables
-├── next.config.js             # Next.js configuration
-├── tailwind.config.ts         # Tailwind CSS configuration
-├── tsconfig.json              # TypeScript configuration
-└── package.json               # Dependencies and scripts
-```
-
-## 🗄️ Database Schema
-
-### TodoList Table
-```prisma
-model TodoList {
-  id         Int      @id @default(autoincrement())
-  sessionId  String   @map("session_id")
-  name       String
-  color      String   @default("blue")
-  createdAt  DateTime @default(now())
-  updatedAt  DateTime @updatedAt
-  todos      Todo[]
-}
-```
-
-### Todo Table
-```prisma
-model Todo {
-  id         Int       @id @default(autoincrement())
-  sessionId  String    @map("session_id")
-  listId     Int?      @map("list_id")
-  title      String
-  detail     String?
-  priority   String    @default("medium")
-  dueDate    String?   @map("due_date")
-  dueTime    String?   @map("due_time")
-  completed  Boolean   @default(false)
-  createdAt  DateTime  @default(now())
-  updatedAt  DateTime  @updatedAt
-  todoList   TodoList? @relation(fields: [listId])
-}
-```
-
-## 🎨 Key Features Explained
+##  Key Features Explained
 
 ### Session-Based Isolation
 Each user gets a unique session ID stored in localStorage, ensuring their todos remain private without requiring authentication.
@@ -257,37 +171,9 @@ Filter todos by:
 - **List**: filter by specific todo list
 
 ### Dark Mode
-Seamless dark mode toggle using next-themes with system preference detection and persistent user preference.
+Seamless dark mode toggle using next-themes with system preference detection and persistent user preference. 
 
-## 🔌 API Endpoints
-
-### Todos
-- `GET /api/todos` - Fetch all todos for session
-- `GET /api/todos?listId={id}` - Fetch todos for specific list
-- `POST /api/todos` - Create new todo
-- `PUT /api/todos/{id}` - Update todo
-- `DELETE /api/todos/{id}` - Delete todo
-
-### Lists
-- `GET /api/lists` - Fetch all lists for session
-- `POST /api/lists` - Create new list
-- `PUT /api/lists/{id}` - Update list
-- `DELETE /api/lists/{id}` - Delete list (cascades to todos)
-
-## 🧪 Testing
-
-```bash
-# Type checking
-npm run type-check
-
-# Linting
-npm run lint
-
-# Build verification
-npm run build
-```
-
-## 🐞 Known Issues
+## Known Issues
 
 - Session-based authentication only (no user accounts yet)
 - No task sharing or collaboration features
@@ -295,7 +181,7 @@ npm run build
 - No task categories or tags beyond lists
 - No recurring tasks support
 
-## 🚀 Future Improvements
+##  Future Improvements
 
 ### Authentication & Users
 - [ ] User registration and login
@@ -330,7 +216,7 @@ npm run build
 - [ ] Email notifications
 - [ ] Push notifications
 
-## 🤝 Contributing
+## Contributing
 
 Contributions are welcome! To contribute:
 
@@ -365,16 +251,16 @@ Contributions are welcome! To contribute:
 - Include clear comments for complex logic
 - Update documentation for new features
 
-## 📄 License
+## License
 
 This project is open source and available under the [MIT License](LICENSE).
 
-## 👤 Author
+## Author
 
 **Kachi**
 - GitHub: [@kachi33](https://github.com/kachi33)
 
-## 🙏 Acknowledgments
+## Acknowledgments
 
 - [ShadCN UI](https://ui.shadcn.com/) - For the beautiful component library
 - [TanStack Query](https://tanstack.com/query) - For amazing data fetching
@@ -384,4 +270,4 @@ This project is open source and available under the [MIT License](LICENSE).
 
 ---
 
-Built with ❤️ using Next.js and TypeScript
+Built with ❤️ by Kachi 
