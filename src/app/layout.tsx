@@ -7,6 +7,7 @@ import QueryProvider from '@/providers/QueryProvider'
 import ThemeToggle from '@/components/ThemeToggle'
 import SidebarWrapper from '@/components/SidebarWrapper'
 import { Toaster } from "@/components/ui/sonner"
+import { Footer } from 'react-day-picker'
 
 
 export const metadata: Metadata = {
@@ -34,9 +35,12 @@ export default function RootLayout({
                     <ThemeToggle />
                   </div>
                 </header>
-                <section className="flex lg:max-w-2xl mx-auto justify-center items-center gap-2  md:gap-4">
+                <section className="flex lg:max-w-2xl mx-auto justify-center items-center gap-2  md:gap-4 pb-20">
                 {children}
                 </section>
+                <Footer className="text-center p-4 text-sm text-muted-foreground fixed bottom-0 left-0 right-0 bg-background" >
+                  &copy; {new Date().getFullYear()} Kachi's ToDo App. All rights reserved.
+                </Footer>
               </main>
               <Toaster />
               <SidebarWrapper />

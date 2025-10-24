@@ -19,10 +19,11 @@ import {
   EmptyDescription,
   EmptyContent,
 } from "@/components/ui/empty";
-import { ListTodo, Plus, Filter } from "lucide-react";
+import { ListTodo, Plus, Filter, FolderPlus } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
 import OfflineStatus from "@/components/OfflineStatus";
+import CreateList from "@/components/CreateList";
 
 function Tasks(): React.JSX.Element {
   const queryClient = useQueryClient();
@@ -46,6 +47,7 @@ function Tasks(): React.JSX.Element {
   const [deleteTodo, setDeleteTodo] = useState<Todo | null>(null);
   const [currentPage, setCurrentPage] = useState<number>(1);
   const [filterModalOpen, setFilterModalOpen] = useState<boolean>(false);
+  const [createListOpen, setCreateListOpen] = useState<boolean>(false);
   const [filters, setFilters] = useState<FilterOptions>({
     priority: [],
     status: "all",
@@ -121,6 +123,22 @@ function Tasks(): React.JSX.Element {
 
   return (
     <div className="w-full flex flex-col gap-3 lg:gap-6">
+      <section className="w-full bg-card flex flex-col gap-3 md:gap-6 lg:gap-8">
+        <Button
+          onClick={() => setCreateListOpen(true)}
+          variant="outline"
+          size="lg"
+          className="w-full border-dashed border-2 h-24 flex flex-col items-center justify-center gap-2 hover:bg-accent/50"
+        >
+          <FolderPlus className="h-8 w-8" />
+          <span className="text-sm font-medium">New List</span>
+        </Button>
+      </section>
+
+{/* Main Content */}
+    <section  className="w-full flex flex-col gap-3 lg:gap-6">
+  
+      {/* Header */}
       <div className="flex items-center  justify-between">
         <h1 className="md:text-2xl text-xl font-bold text-foreground">
           All Tasks
@@ -137,6 +155,7 @@ function Tasks(): React.JSX.Element {
           </Button>
         </div>
       </div>
+
       <div className="text-muted-foreground">
         <Separator className="" />
         <div className="flex justify-end mt-2 gap-3">
@@ -160,15 +179,6 @@ function Tasks(): React.JSX.Element {
 
       {todos.length > 0 ? (
         <>
-          <div className="mb-4 p-4 bg-card border border-border rounded-lg">
-            <h2 className="text-lg font-semibold text-card-foreground">
-              Your Tasks
-              <span className="text-sm text-muted-foreground ml-2">
-                ({todos.length} task{todos.length !== 1 ? "s" : ""})
-              </span>
-            </h2>
-          </div>
-
           <ScrollArea className="h-[60vh] rounded-md">
             <ul className="space-y-2">
               {paginatedTodos.map((todo) => (
@@ -193,11 +203,11 @@ function Tasks(): React.JSX.Element {
             <EmptyMedia variant="icon" className="">
               <ListTodo />
             </EmptyMedia>
-            <EmptyTitle className="">All clear for now</EmptyTitle>
+            <EmptyTitle className="">No tasks found.</EmptyTitle>
             <EmptyDescription className="">
               {todos.length === 0
-                ? "You're all caught up. Take a moment, or plan what's next."
-                : "Great job! All your tasks are complete. Ready for more?"}
+                ? "Create a new task to get started."
+                : "No tasks found."}
             </EmptyDescription>
           </EmptyHeader>
           <EmptyContent className="mt-2">
@@ -214,15 +224,6 @@ function Tasks(): React.JSX.Element {
         </Empty>
       )}
 
-      {editTodo && (
-        <EditTodo
-          todo={editTodo}
-          onUpdate={handleUpdate}
-          open={!!editTodo}
-          onOpenChange={(open) => !open && setEditTodo(null)}
-        />
-      )}
-
       {deleteTodo && (
         <DeleteTodo
           todo={deleteTodo}
@@ -231,6 +232,13 @@ function Tasks(): React.JSX.Element {
           onOpenChange={(open) => !open && setDeleteTodo(null)}
         />
       )}
+
+      <CreateList
+        open={createListOpen}
+        onOpenChange={setCreateListOpen}
+      />
+      </section>
+
     </div>
   );
 }

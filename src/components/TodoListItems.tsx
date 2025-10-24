@@ -6,7 +6,8 @@ import { useSidebar } from "@/contexts/SidebarContext";
 import { TodoListItemProps } from "@/types";
 import { formatDateTime } from "@/lib/dateUtils";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { fetchTodoLists, updateTodo } from "@/lib/offlineApi";
+import { fetchTodoLists, updateTodo, deleteTodo } from "@/lib/offlineApi";
+import { toast } from "sonner";
 import {
   Popover,
   PopoverContent,
@@ -43,6 +44,28 @@ function TodoListItem({
       alert("Failed to move todo. Please try again.");
     },
   });
+
+  // Mutation to delete todo
+  const deleteTodoMutation = useMutation({
+    mutationFn: (todoId: number) => deleteTodo(todoId),
+    onSuccess: () => {
+      toast.success("Task moved to trash");
+      // Invalidate and refetch todos
+      queryClient.invalidateQueries({ queryKey: ["todos"] });
+      queryClient.invalidateQueries({ queryKey: ["todoLists"] });
+      setPopoverOpen(false);
+    },
+    onError: (error) => {
+      toast.error("Failed to delete task");
+      console.error("Failed to delete todo:", error);
+    },
+  });
+
+  const handleDelete = () => {
+    if (confirm("Are you sure you want to move this task to trash?")) {
+      deleteTodoMutation.mutate(todo.id);
+    }
+  };
 
   const getPriorityColor = (priority: string) => {
     switch (priority) {
@@ -163,19 +186,16 @@ function TodoListItem({
               Edit
             </Button>
 
-            {/* Don't forget to push to set sidebar open */}
 
             {/* Delete Button */}
             <Button
               variant="ghost"
               size="sm"
               className="w-full justify-start text-sm text-destructive hover:text-destructive hover:bg-destructive/10"
-              onClick={() => {
-                setPopoverOpen(false);
-              }}
+              onClick={handleDelete}
             >
               <Trash2 className="h-4 w-4 mr-2" />
-              Delete
+              Move to trash
             </Button>
           </div>
         </PopoverContent>

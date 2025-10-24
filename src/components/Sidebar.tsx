@@ -17,6 +17,9 @@ import { Todo } from "@/types";
 import { TaskItem } from "@/components/TaskItem";
 import OfflineStatus from "./OfflineStatus";
 import { Separator } from "@/components/ui/separator";
+import { deleteTodo } from "@/lib/offlineApi";
+import { useQueryClient } from "@tanstack/react-query";
+import { toast } from "sonner";
 
 interface SidebarProps {
   todo: Todo | null;
@@ -30,6 +33,30 @@ export const Sidebar = ({
   onClose,
 }: SidebarProps) => {
   const isEditMode = todo !== null;
+  const queryClient = useQueryClient();
+
+  const handleDelete = async () => {
+    if (!todo) return;
+
+    if (!confirm("Are you sure you want to move this task to trash?")) {
+      return;
+    }
+
+    try {
+      await deleteTodo(todo.id);
+      toast.success("Task moved to trash");
+
+      // Invalidate queries to refresh the list
+      await queryClient.invalidateQueries({ queryKey: ["todos"] });
+      await queryClient.invalidateQueries({ queryKey: ["todoLists"] });
+
+      // Close the sidebar
+      onClose();
+    } catch (error) {
+      toast.error("Failed to delete task");
+      console.error("Failed to delete task:", error);
+    }
+  };
 
   return (
     <Sheet open={isOpen} onOpenChange={onClose}>
@@ -101,10 +128,7 @@ export const Sidebar = ({
                   <>
                     <button
                       className="flex items-center gap-2 px-3 py-2 text-sm hover:bg-red-50 text-red-600 rounded transition-colors text-left"
-                      onClick={() => {
-                        // Handle delete
-                        console.log("Delete task");
-                      }}
+                      onClick={handleDelete}
                     >
                       <Trash2 className="h-4 w-4" />
                       <span>Move to trash</span>

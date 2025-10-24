@@ -3,7 +3,7 @@ import { prisma } from '@/lib/prisma'
 
 export async function GET(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     const sessionId = request.headers.get('X-Session-ID')
@@ -14,7 +14,8 @@ export async function GET(
       )
     }
 
-    const todoId = parseInt(params.id)
+    const resolvedParams = await params;
+    const todoId = parseInt(resolvedParams.id)
     const todo = await prisma.todo.findFirst({
       where: {
         id: todoId,
@@ -162,7 +163,7 @@ export async function PUT(
 
 export async function DELETE(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     const sessionId = request.headers.get('X-Session-ID')
@@ -173,7 +174,8 @@ export async function DELETE(
       )
     }
 
-    const todoId = parseInt(params.id)
+    const resolvedParams = await params;
+    const todoId = parseInt(resolvedParams.id)
 
     // Verify todo exists and belongs to this session
     const existingTodo = await prisma.todo.findFirst({
