@@ -11,11 +11,10 @@ const ProgressChart = ({ stats }: ProgressChartProps) => {
       : 0;
 
   return (
-    <div className="space-y-4">
-      {/* Completion Progress Bar */}
-      <div className="flex flex-col items-center space-y-4">
-        <div className="relative w-32 h-32">
-          <svg className="w-32 h-32 transform -rotate-360" viewBox="0 0 36 36">
+    <div className="flex flex-col items-center space-y-2 md:space-y-4">
+        {/* Completion Progress Bar */}
+        <div className="relative w-24 h-24 md:w-32 md:h-32">
+          <svg className="w-24 h-24 md:w-32 md:h-32 transform -rotate-360" viewBox="0 0 36 36">
             {/* Background circle */}
             <path
               className="stroke-muted"
@@ -53,7 +52,6 @@ const ProgressChart = ({ stats }: ProgressChartProps) => {
           Track your productivity and stay on top of your tasks
         </p>
       </div>
-    </div>
   );
 };
 

@@ -20,7 +20,13 @@ import { Separator } from "@/components/ui/separator";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useState } from "react";
 
-function HomeTodoList(): React.JSX.Element {
+export type MockState = 'loading' | 'error' | 'empty' | 'content' | null;
+
+interface HomeTodoListProps {
+  mockState?: MockState;
+}
+
+function HomeTodoList({ mockState = null }: HomeTodoListProps): React.JSX.Element {
   const [forceLoading, setForceLoading] = useState(false);
   
   const {
@@ -33,7 +39,11 @@ function HomeTodoList(): React.JSX.Element {
     queryFn: () => fetchTodos(),
   });
 
-  const showLoading = isLoading || forceLoading;
+  // Override states with mockState if provided
+  const showLoading = mockState === 'loading' ? true : (mockState === null ? (isLoading || forceLoading) : false);
+  const showError = mockState === 'error' ? true : (mockState === null ? isError : false);
+  const showEmpty = mockState === 'empty' ? true : false;
+  const showContent = mockState === 'content' ? true : false;
 
   const { openSidebar, openCreateMode } = useSidebar();
 
@@ -61,7 +71,7 @@ function HomeTodoList(): React.JSX.Element {
       <div className="flex flex-col gap-3 lg:gap-6">
         <div className="flex items-center  justify-between">
           <h2 className="text-xl font-semibold text-card-foreground">
-            Pending Tasks
+            Upcoming Tasks
           </h2>
           <div className="flex justify-between items-center gap-2">
             <Button
@@ -93,7 +103,7 @@ function HomeTodoList(): React.JSX.Element {
     );
   }
 
-  if (isError) {
+  if (showError) {
     return (
       <div className="flex flex-col gap-3 lg:gap-6">
         <div className="flex items-center justify-between">
@@ -148,7 +158,7 @@ function HomeTodoList(): React.JSX.Element {
 
   // Filter for pending todos and exclude overdue tasks
   const now = new Date();
-  const pendingTodos = todos.filter((todo: Todo) => {
+  let pendingTodos = todos.filter((todo: Todo) => {
     // Only include incomplete tasks
     if (todo.completed) return false;
 
@@ -165,6 +175,42 @@ function HomeTodoList(): React.JSX.Element {
 
     return true;
   });
+
+  // Override with mock data if needed
+  if (showEmpty) {
+    pendingTodos = [];
+  } else if (showContent && pendingTodos.length === 0) {
+    // Create mock todos for content state if there are no real todos
+    pendingTodos = [
+      {
+        id: 1,
+        title: 'Sample Task 1',
+        detail: 'This is a sample task for demonstration',
+        completed: false,
+        priority: 'high',
+        due_date: new Date(Date.now() + 86400000).toISOString().split('T')[0],
+        due_time: '10:00',
+        userId: 'demo-user',
+      },
+      {
+        id: 2,
+        title: 'Sample Task 2',
+        detail: 'Another sample task',
+        completed: false,
+        priority: 'medium',
+        due_date: new Date(Date.now() + 172800000).toISOString().split('T')[0],
+        userId: 'demo-user',
+      },
+      {
+        id: 3,
+        title: 'Sample Task 3',
+        detail: 'One more sample task',
+        completed: false,
+        priority: 'low',
+        userId: 'demo-user',
+      },
+    ] as Todo[];
+  }
 
   // Sort by due date: upcoming tasks first, then tasks without dates
   const sortedTodos = [...pendingTodos].sort((a: Todo, b: Todo) => {

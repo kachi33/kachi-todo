@@ -4,6 +4,9 @@ import { useState } from "react";
 import { Quote } from "lucide-react";
 import { toast } from "sonner";
 
+import { Button } from "./ui/button";
+import { RefreshCw } from "lucide-react";
+
 const MOTIVATIONAL_QUOTES = [
   {
     text: "Discipline beats motivation.",
@@ -67,9 +70,8 @@ const QuotesCard = () => {
   };
 
   return (
-    <div className="flex flex-col items-center justify-between p-8 bg-linear-to-br from-card to-card/80 rounded-2xl border border-border h-full min-h-[300px]">
-      {/* Quote Content */}
-      <div className="flex-1 flex flex-col items-center justify-center text-center px-4">
+    <div className="flex max-h-80 flex-col py-8 px-2 items-center space-y-2 md:space-y-4">
+        {/* Quote Content */}
         <div className="mb-4">
           <Quote className="h-12 w-12 text-muted-foreground/30 mb-4" />
         </div>
@@ -85,23 +87,20 @@ const QuotesCard = () => {
         }`}>
           — {currentQuote.author}
         </p>
+        {/* Action Buttons */}
+        <div className="flex items-center gap-4 ">
+          <button
+            onClick={handleNewQuote}
+            disabled={isRefreshing}
+            className="flex items-center gap-2 cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
+          >
+            <RefreshCw className={`h-5 w-5 ${isRefreshing ? 'animate-spin' : ''}`} />
+            <span>Refresh</span>
+          </button>
+        </div>
       </div>
 
-      {/* Action Buttons
-      <div className="flex items-center gap-4 mt-6">
-        <Button
-          variant="outline"
-          size="lg"
-          className="flex items-center gap-4"
-          onClick={handleNewQuote}
-          disabled={isRefreshing}
-        >
-          <RefreshCw className={`h-5 w-5 ${isRefreshing ? 'animate-spin' : ''}`} />
-          Refresh
-        </Button>
-      </div> */}
-    </div>
-  );
+);
 };
 
 export default QuotesCard;

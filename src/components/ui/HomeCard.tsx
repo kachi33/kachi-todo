@@ -8,7 +8,7 @@ import WeeklyProductivityCard from "../WeeklyProductivityCard";
 import QuotesCard from "../QuotesCard";
 import { Skeleton } from "./skeleton";
 import { Button } from "./button";
-import { AlertCircle, RefreshCw } from "lucide-react";
+import { AlertCircle, RefreshCw, TrendingUp } from "lucide-react";
 import { Swiper, SwiperSlide } from "swiper/react";
 import { Navigation, Pagination, Autoplay, EffectCoverflow } from "swiper/modules";
 import "swiper/css";
@@ -16,19 +16,31 @@ import "swiper/css/navigation";
 import "swiper/css/pagination";
 import "swiper/css/effect-coverflow";
 
-const HOMECARD = () => {
+export type MockState = 'loading' | 'error' | 'empty' | 'content' | null;
+
+interface HomeCardProps {
+  mockState?: MockState;
+}
+
+const HOMECARD = ({ mockState = null }: HomeCardProps) => {
   const { data: stats, isLoading, isError, refetch } = useQuery<StatsType>({
     queryKey: ["userStats"],
     queryFn: fetchUserStats,
   });
 
-  if (isLoading) return (
+  // Override states with mockState if provided
+  const showLoading = mockState === 'loading' ? true : (mockState === null ? isLoading : false);
+  const showError = mockState === 'error' ? true : (mockState === null ? isError : false);
+  const showEmpty = mockState === 'empty';
+  const showContent = mockState === 'content';
+
+  if (showLoading) return (
     <div className="space-y-6 mb-6">
       <div className="space-y-3">
         <div className="space-y-4">
           {/* Skeleton for carousel */}
           <div className="flex flex-col items-center space-y-4">
-            <Skeleton className="w-full h-[350px] rounded-2xl" />
+            <Skeleton className="w-full h-70 rounded-2xl" />
             <div className="flex gap-2">
               <Skeleton className="w-2 h-2 rounded-full" />
               <Skeleton className="w-2 h-2 rounded-full" />
@@ -41,7 +53,7 @@ const HOMECARD = () => {
     </div>
   );
 
-  if (isError) return (
+  if (showError) return (
     <div className="space-y-6 mb-6">
       <div className="flex flex-col items-center justify-center p-8 bg-linear-to-br from-card to-card/80 rounded-2xl border border-destructive/50 h-full min-h-[300px]">
         {/* Error Icon */}
@@ -69,10 +81,45 @@ const HOMECARD = () => {
     </div>
   );
 
-  if (!stats) return null;
+  // Handle empty state
+  if (showEmpty) {
+    return (
+      <div className="space-y-6 mb-6">
+        <div className="flex flex-col items-center justify-center p-8 bg-linear-to-br from-card to-card/80 rounded-2xl border border-border h-full min-h-[300px]">
+          {/* Empty Icon */}
+          <TrendingUp className="h-16 w-16 text-muted-foreground mb-6" />
+
+          {/* Empty Message */}
+          <h3 className="text-2xl font-bold text-foreground mb-2">
+            No Activity Yet
+          </h3>
+          <p className="text-center text-muted-foreground mb-6 max-w-md">
+            Start creating and completing tasks to see your productivity statistics here.
+          </p>
+        </div>
+      </div>
+    );
+  }
+
+  // Use mock stats for content state if no real stats available
+  let displayStats = stats;
+  if (showContent && !stats) {
+    displayStats = {
+      total_todos: 15,
+      completed_todos: 10,
+      pending_todos: 5,
+      completion_rate: 66.7,
+      todos_created_today: 3,
+      todos_completed_today: 2,
+      active_streak: 5,
+      total_productivity_score: 85,
+    };
+  }
+
+  if (!displayStats) return null;
 
   return (
-    <div className="space-y-2 mb-6">
+    <div className="space-y-2 md:mb-6">
       {/* Swiper Carousel Container */}
       <div className="relative">
         <style jsx global>{`
@@ -144,26 +191,21 @@ const HOMECARD = () => {
           className="w-full m-0 text-muted-foreground"
         >
           {/* Slide 1: Progress Chart */}
-          <SwiperSlide className=" max-w-sm ">
-            <div className="p-1">
-              <div className="bg-card border border-border rounded-2xl p-4">
-                <ProgressChart stats={stats} />
+          <SwiperSlide className=" max-w-xs bg-card border border-border rounded-2xl shadow-lg ">
+              <div className="bg-card border border-border rounded-2xl shadow-lg p-4">
+                <ProgressChart stats={displayStats} />
               </div>
-            </div>
           </SwiperSlide>
 
-          {/* Slide 3: Weekly Productivity
-          <SwiperSlide className=" max-w-sm ">
-            <div className="p-1">
+          {/* Slide 3: Weekly Productivity */}
+          <SwiperSlide className=" max-w-xs bg-card border border-border rounded-2xl shadow-lg ">
               <WeeklyProductivityCard />
-            </div>
-          </SwiperSlide> */}
+              {/* something else */}
+          </SwiperSlide>
 
           {/* Slide 4: Quotes */}
-          <SwiperSlide className=" max-w-sm ">
-            <div className="p-1">
+          <SwiperSlide className=" max-w-xs bg-card border border-border rounded-2xl shadow-lg ">
               <QuotesCard />
-            </div>
           </SwiperSlide>
         </Swiper>
       </div>

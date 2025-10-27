@@ -4,7 +4,7 @@ A modern, full-featured Todo List application built with **Next.js 16**, **TypeS
 
 ## Live Demo
 
-[Kachi-todo-app](https://kachi-todo.netlify.app/)
+[Kachi-todo-app](https://kachi-todo.pipeops.net//)
 
 ##  Features
 

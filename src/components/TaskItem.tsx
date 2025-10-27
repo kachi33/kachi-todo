@@ -1,22 +1,43 @@
 import { useState, useEffect, useMemo } from "react";
-import { ArrowUpNarrowWide, BadgeIcon, Check, CircleDot, ListTree, Save } from "lucide-react";
+import {
+  ArrowUpNarrowWide,
+  BadgeIcon,
+  Check,
+  CircleDot,
+  ListTree,
+  Save,
+  AlertCircle,
+  RefreshCw,
+  ChevronDown,
+} from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
-import { Select, SelectItem } from "@/components/ui/select";
 import {
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
-} from "@/components/ui/popover";
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { createTodo, updateTodo, fetchTodoLists } from "@/lib/offlineApi";
 import { Todo, TodoList, CreateTodoData } from "@/types";
 import { toast } from "sonner";
 import { EnhancedCalendar } from "@/components/EnhancedCalendar";
 import { Separator } from "./ui/separator";
+import { Skeleton } from "@/components/ui/skeleton";
+import {
+  Empty,
+  EmptyHeader,
+  EmptyMedia,
+  EmptyTitle,
+  EmptyDescription,
+  EmptyContent,
+} from "@/components/ui/empty";
+
+export type MockState = "loading" | "error" | "empty" | "content" | null;
 
 // Utility function to format Date to ISO string (YYYY-MM-DD)
 const formatDateToISO = (date?: Date) =>
@@ -26,9 +47,15 @@ interface TaskItemProps {
   todo: Todo | null;
   onSave?: (todo: Todo) => void;
   onClose?: () => void;
+  mockState?: MockState;
 }
 
-export const TaskItem = ({ todo, onSave, onClose }: TaskItemProps) => {
+export const TaskItem = ({
+  todo,
+  onSave,
+  onClose,
+  mockState = null,
+}: TaskItemProps) => {
   const queryClient = useQueryClient();
 
   // Form state
@@ -179,7 +206,7 @@ export const TaskItem = ({ todo, onSave, onClose }: TaskItemProps) => {
       onSave?.(savedTodo);
 
       // Small delay to ensure UI updates before closing
-      await new Promise(resolve => setTimeout(resolve, 100));
+      await new Promise((resolve) => setTimeout(resolve, 100));
 
       // Close
       onClose?.();
@@ -198,42 +225,82 @@ export const TaskItem = ({ todo, onSave, onClose }: TaskItemProps) => {
     }
   };
 
+  // Mock state rendering
+  const showLoading = mockState === "loading";
+  const showError = mockState === "error";
+  const showEmpty = mockState === "empty";
+
+  if (showLoading) {
+    return (
+      <div className="space-y-4">
+        <Skeleton className="h-20 w-full" />
+        <div className="space-y-3">
+          <Skeleton className="h-12 w-full" />
+          <Skeleton className="h-12 w-full" />
+          <Skeleton className="h-12 w-full" />
+          <Skeleton className="h-24 w-full" />
+        </div>
+      </div>
+    );
+  }
+
+  if (showError) {
+    return (
+      <div className="flex flex-col items-center justify-center p-8 bg-linear-to-br from-card to-card/80 rounded-2xl border border-destructive/50 h-full min-h-[300px]">
+        <AlertCircle className="h-16 w-16 text-destructive mb-6" />
+        <h3 className="text-2xl font-bold text-foreground mb-2">
+          Failed to Load Task
+        </h3>
+        <p className="text-center text-muted-foreground mb-6 max-w-md">
+          We couldn't retrieve this task. Please check your connection and try
+          again.
+        </p>
+        <Button
+          onClick={() => window.location.reload()}
+          variant="default"
+          size="default"
+          className="flex items-center gap-2"
+        >
+          <RefreshCw className="h-4 w-4" />
+          Retry
+        </Button>
+      </div>
+    );
+  }
+
+  if (showEmpty) {
+    return (
+      <Empty className="from-muted/50 to-background h-full bg-linear-to-b from-30%">
+        <EmptyHeader className="">
+          <EmptyMedia className="" variant="icon">
+            <CircleDot />
+          </EmptyMedia>
+          <EmptyTitle className="">No Task Selected</EmptyTitle>
+          <EmptyDescription className="">
+            Select a task from the list to view details, or create a new one.
+          </EmptyDescription>
+        </EmptyHeader>
+      </Empty>
+    );
+  }
+
   return (
-    <div className="space-y-4">
+    <div className=" text-muted-foreground">
       {/* Title */}
-      <div className="space-y-2">
-        <Label htmlFor="title" className=""></Label>
+      <div className="">
         <Input
           type="text"
           id="title"
           value={title}
           onChange={(e) => setTitle(e.target.value)}
           placeholder={isEditMode ? "Edit task" : "New task"}
-          className="w-full px-0 shadow-none border-none h-24 placeholder:text-muted-foreground text-3xl! placeholder:text-3xl! align-top outline-none focus:outline-none focus:ring-0 focus-visible:ring-0 focus-visible:ring-offset-0 bg-transparent"
+          className={`w-full px-2 shadow-none border-none h-24 placeholder:text-muted-foreground/50 text-3xl! placeholder:text-3xl! align-top outline-none focus:outline-none focus:ring-0 focus-visible:ring-0 focus-visible:ring-offset-0 bg-transparent! ${
+            title.trim() ? "text-primary" : "text-muted-foreground"
+          }`}
         />
       </div>
 
-      <div className="space-y-2 pl-6 ">
-
-        {/* Priority */}
-        <div className="space-y-2 flex items-center">
-          <Label htmlFor="priority" className="w-1/3">
-          <ArrowUpNarrowWide className="inline mr-1 h-4 w-4" />
-            Priority
-          </Label>
-          <Select
-            id="priority"
-            value={priority}
-            onValueChange={setPriority}
-            className="flex-1 px-2 border-none outline-none text-muted-foreground focus:outline-none focus:ring-0 focus-visible:ring-0 focus-visible:ring-offset-0 bg-transparent"
-          >
-            <SelectItem value="urgent">Urgent</SelectItem>
-            <SelectItem value="high">High</SelectItem>
-            <SelectItem value="medium">Medium</SelectItem>
-            <SelectItem value="low">Low</SelectItem>
-          </Select>
-        </div>
-
+      <div className="md:ml-10 ml-2 flex flex-col gap-4 md:gap-6">
         {/* Date & Time with Duration */}
         <EnhancedCalendar
           date={dueDate}
@@ -246,23 +313,77 @@ export const TaskItem = ({ todo, onSave, onClose }: TaskItemProps) => {
           onEndDateChange={setEndDate}
         />
 
+        {/* List Selection */}
+        <div className=" flex items-center">
+          <Label htmlFor="list" className="w-1/3  ">
+            <ListTree className="inline h-4 w-4" />
+            List
+          </Label>
+          <div className="flex-1">
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  className={`w-1/3 justify-between text-left font-normal border-none outline-none focus:outline-none focus:ring-0 focus-visible:ring-0 focus-visible:ring-offset-0 bg-transparent hover:bg-transparent px-0! ${
+                    selectedListId !== null
+                      ? "text-primary"
+                      : "text-muted-foreground"
+                  }`}
+                >
+                  <span>
+                    {selectedListId
+                      ? todoLists.find((list) => list.id === selectedListId)
+                          ?.name || "Not Set"
+                      : "Not Set"}
+                  </span>
+                  <ChevronDown className="h-4 w-4 opacity-50" />
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent className="w-[200px]" align="start">
+                <DropdownMenuItem
+                  className=""
+                  inset={false}
+                  onClick={() => setSelectedListId(null)}
+                >
+                  <span>Not Set</span>
+                  {!selectedListId && <Check className="h-4 w-4 ml-auto" />}
+                </DropdownMenuItem>
+                {todoLists.map((list: TodoList) => (
+                  <DropdownMenuItem
+                    key={list.id}
+                    className=""
+                    inset={false}
+                    onClick={() => setSelectedListId(list.id)}
+                  >
+                    <span>{list.name}</span>
+                    {selectedListId === list.id && (
+                      <Check className="h-4 w-4 ml-auto" />
+                    )}
+                  </DropdownMenuItem>
+                ))}
+              </DropdownMenuContent>
+            </DropdownMenu>
+          </div>
+        </div>
+
         {/* Status */}
-        <div className="space-y-2 flex items-center">
+        <div className=" flex items-center">
           <Label htmlFor="status" className="w-1/3">
-            <CircleDot className="inline mr-1 h-4 w-4" />
+            <CircleDot className="inline h-4 w-4" />
             Status
           </Label>
-          <div className="flex-1 flex items-center gap-3">
-            {/* Status Badge */}
-            <span
-              className={`inline-block px-3 py-1 rounded text-sm font-medium ${
-                completed
-                  ? "bg-green-400 text-green-900"
-                  : "bg-yellow-400 text-yellow-900"
-              }`}
-            >
+
+          {/* Status and Mark as Complete */}
+          <div className="flex-1 flex flex-col md:flex-row  md:gap-3 text-primary">
+            <p className="text-sm">
               {completed ? "Completed" : "Pending"}
-            </span>
+              <span
+                className={`inline-block px-1 py-1 ml-1 rounded-full ${
+                  completed ? "bg-green-400" : "bg-yellow-400"
+                }`}
+              ></span>
+            </p>
 
             {/* Show "Mark as complete" checkbox only in edit mode and if not completed */}
             {isEditMode && !completed && (
@@ -274,7 +395,10 @@ export const TaskItem = ({ todo, onSave, onClose }: TaskItemProps) => {
                     setCompleted(checked as boolean);
                   }}
                 />
-                <Label htmlFor="mark-complete" className="cursor-pointer text-sm">
+                <Label
+                  htmlFor="mark-complete"
+                  className="cursor-pointer text-sm"
+                >
                   Mark as complete
                 </Label>
               </div>
@@ -282,58 +406,68 @@ export const TaskItem = ({ todo, onSave, onClose }: TaskItemProps) => {
           </div>
         </div>
 
-
-        {/* List Selection */}
-        <div className="space-y-2 flex items-center">
-          <Label htmlFor="list" className="w-1/3">
-            <ListTree className="inline mr-1 h-4 w-4" />
-            List
+        {/* Priority */}
+        <div className="flex items-center">
+          <Label htmlFor="priority" className="w-1/3">
+            <ArrowUpNarrowWide className="inline h-4 w-4" />
+            Priority
           </Label>
-          <div className="flex-1">
-            <Popover>
-              <PopoverTrigger asChild>
+          <div className="flex-1 p-0">
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
                 <Button
                   variant="ghost"
                   size="sm"
-                  className="w-full justify-start text-left font-normal border-none outline-none focus:outline-none focus:ring-0 focus-visible:ring-0 focus-visible:ring-offset-0 bg-transparent hover:bg-transparent px-0"
+                  className="w-1/3 justify-between text-left font-normal border-none outline-none focus:outline-none focus:ring-0 focus-visible:ring-0 focus-visible:ring-offset-0  hover:bg-transparent px-0! text-primary"
                 >
-                  {selectedListId
-                    ? todoLists.find((list) => list.id === selectedListId)?.name || "Not Set"
-                    : "Not Set"}
+                  <span className="capitalize">{priority}</span>
+                  <ChevronDown className="h-4 w-4 opacity-50" />
                 </Button>
-              </PopoverTrigger>
-              <PopoverContent
-                className="w-[200px] p-0 bg-green-50"
-                align="start"
-                sideOffset={8}
-              >
-                <div className="flex flex-col">
-                  <button
-                    onClick={() => setSelectedListId(null)}
-                    className="px-4 py-2 text-left text-sm hover:bg-green-100 transition-colors flex items-center justify-between"
-                  >
-                    <span>Not Set</span>
-                    {!selectedListId && <Check className="h-4 w-4" />}
-                  </button>
-                  {todoLists.map((list: TodoList) => (
-                    <button
-                      key={list.id}
-                      onClick={() => setSelectedListId(list.id)}
-                      className="px-4 py-2 text-left text-sm hover:bg-green-100 transition-colors flex items-center justify-between"
-                    >
-                      <span>{list.name}</span>
-                      {selectedListId === list.id && <Check className="h-4 w-4" />}
-                    </button>
-                  ))}
-                </div>
-              </PopoverContent>
-            </Popover>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent className="w-[200px]" align="start">
+                <DropdownMenuItem
+                  className=""
+                  inset={false}
+                  onClick={() => setPriority("urgent")}
+                >
+                  <span>Urgent</span>
+                  {priority === "urgent" && (
+                    <Check className="h-4 w-4 ml-auto" />
+                  )}
+                </DropdownMenuItem>
+                <DropdownMenuItem
+                  className=""
+                  inset={false}
+                  onClick={() => setPriority("high")}
+                >
+                  <span>High</span>
+                  {priority === "high" && <Check className="h-4 w-4 ml-auto" />}
+                </DropdownMenuItem>
+                <DropdownMenuItem
+                  className=""
+                  inset={false}
+                  onClick={() => setPriority("medium")}
+                >
+                  <span>Medium</span>
+                  {priority === "medium" && (
+                    <Check className="h-4 w-4 ml-auto" />
+                  )}
+                </DropdownMenuItem>
+                <DropdownMenuItem
+                  className=""
+                  inset={false}
+                  onClick={() => setPriority("low")}
+                >
+                  <span>Low</span>
+                  {priority === "low" && <Check className="h-4 w-4 ml-auto" />}
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
           </div>
         </div>
 
-
         {/* Details */}
-        <div className="space-y-2 flex flex-col">
+        <div className="flex gap-3 flex-col">
           <Label htmlFor="detail" className="">
             Detail
           </Label>
@@ -343,18 +477,20 @@ export const TaskItem = ({ todo, onSave, onClose }: TaskItemProps) => {
             onChange={(e) => setDetail(e.target.value)}
             placeholder="Add details..."
             rows={2}
-            className="resize-none border-none outline-none focus:outline-none focus:ring-0 focus-visible:ring-0 focus-visible:ring-offset-0 bg-transparent"
-            />
+            className={`resize-none border-none outline-none focus:outline-none focus:ring-0 focus-visible:ring-0 focus-visible:ring-offset-0 bg-transparent ${
+              detail.trim() ? "text-primary" : "text-muted-foreground"
+            }`}
+          />
         </div>
+      </div>
 
-            </div>
       {/* Save Button - Only show when there are changes */}
       {hasChanges && (
-        <div className="flex gap-3 pt-4">
+        <div className="flex justify-end">
           <Button
             onClick={handleSaveTodo}
             disabled={!title.trim() || isSaving}
-            className="flex-1"
+            className=""
             variant="default"
             size="default"
           >
@@ -364,9 +500,7 @@ export const TaskItem = ({ todo, onSave, onClose }: TaskItemProps) => {
                 Saving...
               </>
             ) : (
-              <>
-                {isEditMode ? "Save Changes" : "Add Task"}
-              </>
+              <>{isEditMode ? "Save Changes" : "Add Task"}</>
             )}
           </Button>
         </div>

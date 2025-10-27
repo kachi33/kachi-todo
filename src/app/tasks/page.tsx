@@ -32,10 +32,12 @@ import CreateList from "@/components/CreateList";
 import ListCard from "@/components/ListCard";
 import DeleteList from "@/components/DeleteList";
 import { TodoList } from "@/types";
+import DevStateToggler, { MockState } from "@/components/DevStateToggler";
 
 function Tasks(): React.JSX.Element {
   const queryClient = useQueryClient();
   const { openCreateMode } = useSidebar();
+  const [mockState, setMockState] = useState<MockState>(null);
 
   const {
     data: todos = [],
@@ -166,7 +168,12 @@ function Tasks(): React.JSX.Element {
   );
   const totalPages = Math.ceil(filteredTodos.length / todosPerPage);
 
-  if (isLoading)
+  // Override states based on mockState
+  const displayIsLoading = mockState === 'loading' ? true : (mockState === null ? isLoading : false);
+  const displayIsError = mockState === 'error' ? true : (mockState === null ? isError : false);
+  const displayIsEmpty = mockState === 'empty' ? true : false;
+
+  if (displayIsLoading)
     return (
       <div className="w-full flex flex-col gap-4">
         {/* Skeleton for list cards */}
@@ -184,8 +191,9 @@ function Tasks(): React.JSX.Element {
 
         <Separator className="" />
 
-        <div className="flex items-center justify-end">
-          <Skeleton className="h-6 w-36" />
+        <div className="flex items-center justify-end gap-2">
+          <OfflineStatus/>
+          <Skeleton className="h-10 w-14" />
         </div>
 
         {/* Skeleton for task items */}
@@ -198,7 +206,7 @@ function Tasks(): React.JSX.Element {
       </div>
     );
 
-  if (isError)
+  if (displayIsError)
     return (
       <div className="w-full flex flex-col gap-4">
         <div className="flex flex-col items-center justify-center p-8 bg-linear-to-br from-card to-card/80 rounded-2xl border border-destructive/50 h-full min-h-[400px]">
@@ -225,13 +233,19 @@ function Tasks(): React.JSX.Element {
             Retry
           </Button>
         </div>
+
+        {/* Dev State Toggler */}
+        <DevStateToggler
+          currentState={mockState}
+          onStateChange={setMockState}
+        />
       </div>
     );
 
   return (
-    <div className="w-full flex flex-col gap-3 lg:gap-4">
-      <section className="w-full">
-        <div className="flex items-center gap-4 overflow-x-auto pb-4 scrollbar-hide">
+    <div className="w-full flex flex-col gap-3 lg:gap-4 p-2 ">
+      <section className="w-full p-2">
+        <div className="flex items-center gap-4 p-2 overflow-x-auto scrollbar-hide">
           {/* New List Button */}
           <div className="shrink-0">
             <Button
@@ -241,7 +255,7 @@ function Tasks(): React.JSX.Element {
               }}
               variant="outline"
               size="lg"
-              className="w-[200px] h-[140px] border-dashed border-2 flex flex-col items-center justify-center gap-2 hover:bg-accent/50 rounded-xl"
+              className="w-36 h-[140px] border-dashed border-2 flex flex-col items-center justify-center gap-2 hover:bg-accent/50 rounded-xl"
             >
               <FolderPlus className="h-8 w-8" />
               <span className="text-sm font-medium">New List</span>
@@ -324,27 +338,7 @@ function Tasks(): React.JSX.Element {
           </div>
         </div>
 
-        {todos.length > 0 ? (
-          <>
-            <ScrollArea className="h-[40vh] p-2 md:px-4">
-              <ul className="space-y-2">
-                {paginatedTodos.map((todo) => (
-                  <TodoListItem key={todo.id} todo={todo} />
-                ))}
-              </ul>
-            </ScrollArea>
-
-            {totalPages > 1 && (
-              <div className="flex justify-center">
-                <PaginationControl
-                  currentPage={currentPage}
-                  totalPages={totalPages}
-                  onPageChange={handlePageChange}
-                />
-              </div>
-            )}
-          </>
-        ) : (
+        {(displayIsEmpty || todos.length === 0) ? (
           <Empty className="from-muted/50 to-background h-full bg-linear-to-b from-30%">
             <EmptyHeader className="">
               <EmptyMedia variant="icon" className="">
@@ -369,6 +363,26 @@ function Tasks(): React.JSX.Element {
               </Button>
             </EmptyContent>
           </Empty>
+        ) : (
+          <>
+            <ScrollArea className="h-[40vh] p-2 md:px-4">
+              <ul className="space-y-2">
+                {paginatedTodos.map((todo) => (
+                  <TodoListItem key={todo.id} todo={todo} />
+                ))}
+              </ul>
+            </ScrollArea>
+
+            {totalPages > 1 && (
+              <div className="flex justify-center">
+                <PaginationControl
+                  currentPage={currentPage}
+                  totalPages={totalPages}
+                  onPageChange={handlePageChange}
+                />
+              </div>
+            )}
+          </>
         )}
 
         <CreateList
@@ -386,6 +400,12 @@ function Tasks(): React.JSX.Element {
           onOpenChange={(open) => !open && setDeleteList(null)}
         />
       </section>
+
+      {/* Dev State Toggler - only visible in development */}
+      <DevStateToggler
+        currentState={mockState}
+        onStateChange={setMockState}
+      />
     </div>
   );
 }

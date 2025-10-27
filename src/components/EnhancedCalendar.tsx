@@ -204,18 +204,18 @@ export function EnhancedCalendar({
   };
 
   return (
-    <div className="flex item-center justify-between gap-2 ">
+        <div className=" flex items-center">
       <Label htmlFor="date-time-picker" className="w-1/3">
-        <Calendar1 className="inline mr-1 h-4 w-4" />
+        <Calendar1 className="inline h-4 w-4" />
         Due
       </Label>
       <DropdownMenu open={open} onOpenChange={setOpen}>
-        <DropdownMenuTrigger asChild className="flex-1">
+        <DropdownMenuTrigger asChild className="flex-1 m-0">
           <Button
             variant="ghost"
             size="default"
             id="date-time-picker"
-            className="w-full justify-between text-muted-foreground font-normal border-none outline-none focus:outline-none focus:ring-0 focus-visible:ring-0 focus-visible:ring-offset-0 bg-transparent hover:bg-transparent px-0"
+            className={`w-full bg-transparent justify-between ${date ? 'text-primary' : 'text-muted-foreground'} font-normal border-none outline-none focus:outline-none focus:ring-0 focus-visible:ring-0 focus-visible:ring-offset-0 hover:bg-transparent px-0`}
           >
             {formatDateDisplay(date, startTime, endTime, endDate)}
           </Button>
@@ -236,9 +236,11 @@ export function EnhancedCalendar({
             />
 
             {/* Time inputs and duration selector */}
-            <div className="border-t bg-amber-50 p-4 space-y-3">
+            <div className="border-t p-2 md:p-4 space-y-2">
+
+              
               {/* Set Time Toggle */}
-              <div className="space-y-2">
+              <div className="space-y-2 ">
                 <div className="flex items-center justify-between">
                   <Label className="text-sm">Set time</Label>
                   <Switch
@@ -263,33 +265,32 @@ export function EnhancedCalendar({
               {showTimeSelector && (
                 <>
                   {/* Start Time */}
-                  <div className="space-y-2 w-full bg-green-50 flex items-baseline justify-between">
-                    <Label htmlFor="start-time" className="text-sm w-1/3">
+                  <div className=" w-full flex items-center justify-between">
+                    <Label htmlFor="start-time" className="text-sm">
                       {" "}
-                      Due
+                      Time
                     </Label>
                     <Input
                       type="time"
                       id="start-time"
                       value={startTime || ""}
                       onChange={(e) => handleStartTimeChange(e.target.value)}
-                      className="flex-1 shadow-none border-none appearance-none [&::-webkit-calendar-picker-indicator]:hidden [&::-webkit-calendar-picker-indicator]:appearance-noneoutline-none text-muted-foreground focus:outline-none focus:ring-0 focus-visible:ring-0 focus-visible:ring-offset-0 bg-transparent"
+                      className={`w-1/2 pl-9 text-sm shadow-none border-none appearance-none [&::-webkit-calendar-picker-indicator]:hidden [&::-webkit-calendar-picker-indicator]:appearance-noneoutline-none ${startTime ? 'text-primary' : 'text-muted-foreground'} focus:outline-none focus:ring-0 focus-visible:ring-0 focus-visible:ring-offset-0`}
                     />
                   </div>
 
                   {/* Duration Selector */}
                   {startTime && (
-                    <div className="space-y-2 w-full bg-green-50 flex items-baseline justify-between">
-                      <Label htmlFor="duration" className="text-sm w-1/3">
+                    <div className="w-full flex justify-between items-center">
+                      <Label htmlFor="duration" className="text-sm">
                         Duration
                       </Label>
                       <Select
                         id="duration"
                         value={selectedDuration}
                         onValueChange={handleDurationChange}
-                        className="flex-1 shadow-none border-none appearance-none [&::-webkit-calendar-picker-indicator]:hidden [&::-webkit-calendar-picker-indicator]:appearance-noneoutline-none text-muted-foreground focus:outline-none focus:ring-0 focus-visible:ring-0 focus-visible:ring-offset-0 bg-transparent"
+                        className={`shadow-none border-none appearance-none [&::-webkit-calendar-picker-indicator]:hidden [&::-webkit-calendar-picker-indicator]:appearance-noneoutline-none ${selectedDuration ? 'text-primary' : 'text-muted-foreground'} focus:outline-none focus:ring-0 focus-visible:ring-0 focus-visible:ring-offset-0 bg-transparent`}
                       >
-                        <SelectItem value="">In...</SelectItem>
                         {DURATION_OPTIONS.map((option) => (
                           <SelectItem
                             key={option.value}
@@ -303,8 +304,8 @@ export function EnhancedCalendar({
                   )}
 
                   {/* End Time */}
-                  {startTime && (
-                    <div className="space-y-2">
+                  {isCustomDuration &&(
+                  <div className=" w-full flex items-center justify-between">
                       <Label htmlFor="end-time" className="text-sm">
                         End Time
                       </Label>
@@ -314,7 +315,7 @@ export function EnhancedCalendar({
                         value={endTime || ""}
                         onChange={(e) => onEndTimeChange?.(e.target.value)}
                         disabled={!isCustomDuration && selectedDuration !== ""}
-                        className="w-full"
+                      className={`w-1/2 pl-9 text-sm shadow-none border-none appearance-none [&::-webkit-calendar-picker-indicator]:hidden [&::-webkit-calendar-picker-indicator]:appearance-noneoutline-none ${endTime ? 'text-primary' : 'text-muted-foreground'} focus:outline-none focus:ring-0 focus-visible:ring-0 focus-visible:ring-offset-0`}
                       />
                     </div>
                   )}
@@ -322,7 +323,7 @@ export function EnhancedCalendar({
               )}
 
               {/* Spans multiple days checkbox */}
-              {startTime && endTime && (
+              {isCustomDuration && (
                 <div className="flex items-center gap-2">
                   <input
                     type="checkbox"
