@@ -12,6 +12,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import { VisuallyHidden } from "@/components/ui/visually-hidden";
 import { useState } from "react";
 import { MoreVertical, Trash2, Copy, WifiOff } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -90,7 +91,10 @@ export const Sidebar = ({ todo, isOpen, onClose }: SidebarProps) => {
         side="right"
         className="w-80 lg:w-[450px] sm:max-w-none flex flex-col h-full"
       >
-        <SheetHeader className="flex items-start pl-10 border-b border-border pt-6 pb-2">
+        <SheetHeader className="flex items-start pl-10 pt-6 pb-2">
+          <VisuallyHidden>
+            <SheetTitle className="">{isEditMode ? "Edit Task" : "Create New Task"}</SheetTitle>
+          </VisuallyHidden>
           <div className="flex w-full items-end justify-end">
 
             {/* More Actions Menu */}

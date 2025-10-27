@@ -24,6 +24,7 @@ import {
   FolderPlus,
   AlertCircle,
   RefreshCw,
+  X,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
@@ -113,19 +114,19 @@ function Tasks(): React.JSX.Element {
     if (filters.listId !== null) {
       const activeList = todoLists.find((list) => list.id === filters.listId);
       if (activeList) {
-        filterTexts.push(`List: ${activeList.name}`);
+        filterTexts.push(`${activeList.name}`);
       }
     }
 
     // Priority filter
     if (filters.priority.length > 0) {
-      filterTexts.push(`Priority: ${filters.priority.join(", ")}`);
+      filterTexts.push(`${filters.priority.join(", ")} priority`);
     }
 
     // Status filter
     if (filters.status !== "all") {
       filterTexts.push(
-        `Status: ${
+        `${
           filters.status.charAt(0).toUpperCase() + filters.status.slice(1)
         }`
       );
@@ -244,6 +245,8 @@ function Tasks(): React.JSX.Element {
 
   return (
     <div className="w-full flex flex-col gap-3 lg:gap-4 p-2 ">
+
+      {/* List Cards */}
       <section className="w-full p-2">
         <div className="flex items-center gap-4 p-2 overflow-x-auto scrollbar-hide">
           {/* New List Button */}
@@ -286,7 +289,6 @@ function Tasks(): React.JSX.Element {
           <h1 className="md:text-2xl text-xl font-bold text-foreground">
             All Tasks
           </h1>
-          <div className="flex items-center gap-2">
             <Button
               onClick={openCreateMode}
               variant="default"
@@ -296,10 +298,10 @@ function Tasks(): React.JSX.Element {
               <Plus className="h-4 w-4 mr-2" />
               Add New Task
             </Button>
-          </div>
         </div>
 
         <Separator className="" />
+
         {/* filters and them */}
         <div className="text-muted-foreground flex items-center justify-between">
           <div className="flex items-center gap-2">
@@ -313,7 +315,8 @@ function Tasks(): React.JSX.Element {
                   size="sm"
                   className="h-6 text-xs"
                 >
-                  Clear All
+                  Clear 
+                  <X className="ml-1 size-4"/>
                 </Button>
               </>
             )}
@@ -365,8 +368,10 @@ function Tasks(): React.JSX.Element {
           </Empty>
         ) : (
           <>
-            <ScrollArea className="h-[40vh] p-2 md:px-4">
-              <ul className="space-y-2">
+          
+          {/* Tasks */}
+            <ScrollArea className="h-[50vh] p-2 md:px-4">
+              <ul className="space-y-2 md:space-y-4">
                 {paginatedTodos.map((todo) => (
                   <TodoListItem key={todo.id} todo={todo} />
                 ))}
@@ -374,7 +379,7 @@ function Tasks(): React.JSX.Element {
             </ScrollArea>
 
             {totalPages > 1 && (
-              <div className="flex justify-center">
+              <div className="">
                 <PaginationControl
                   currentPage={currentPage}
                   totalPages={totalPages}

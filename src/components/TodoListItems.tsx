@@ -1,5 +1,4 @@
 import { useState } from "react";
-import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Calendar, EllipsisVertical, Trash2, Edit2, Copy } from "lucide-react";
 import { useSidebar } from "@/contexts/SidebarContext";
@@ -9,11 +8,10 @@ import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { fetchTodoLists, updateTodo, deleteTodo, createTodo } from "@/lib/offlineApi";
 import { toast } from "sonner";
 import {
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
-} from "@/components/ui/popover";
-import { Select, SelectContent, SelectItem } from "@/components/ui/select";
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 
 function TodoListItem({
   todo,
@@ -21,7 +19,7 @@ function TodoListItem({
   onDelete,
 }: TodoListItemProps): React.JSX.Element {
   const { openSidebar } = useSidebar();
-  const [popoverOpen, setPopoverOpen] = useState(false);
+  const [dropdownOpen, setDropdownOpen] = useState(false);
   const queryClient = useQueryClient();
 
   // Fetch available lists
@@ -37,7 +35,7 @@ function TodoListItem({
     onSuccess: () => {
       // Invalidate and refetch todos
       queryClient.invalidateQueries({ queryKey: ["todos"] });
-      setPopoverOpen(false);
+      setDropdownOpen(false);
     },
     onError: (error) => {
       console.error("Failed to move todo:", error);
@@ -53,7 +51,7 @@ function TodoListItem({
       // Invalidate and refetch todos
       queryClient.invalidateQueries({ queryKey: ["todos"] });
       queryClient.invalidateQueries({ queryKey: ["todoLists"] });
-      setPopoverOpen(false);
+      setDropdownOpen(false);
     },
     onError: (error) => {
       toast.error("Failed to delete task");
@@ -78,7 +76,7 @@ function TodoListItem({
       // Invalidate and refetch todos
       queryClient.invalidateQueries({ queryKey: ["todos"] });
       queryClient.invalidateQueries({ queryKey: ["todoLists"] });
-      setPopoverOpen(false);
+      setDropdownOpen(false);
     },
     onError: (error) => {
       toast.error("Failed to duplicate task");
@@ -98,7 +96,7 @@ function TodoListItem({
       // Invalidate and refetch todos
       queryClient.invalidateQueries({ queryKey: ["todos"] });
       queryClient.invalidateQueries({ queryKey: ["todoLists"] });
-      setPopoverOpen(false);
+      setDropdownOpen(false);
     },
     onError: (error) => {
       toast.error("Failed to update task");
@@ -135,11 +133,18 @@ function TodoListItem({
     }
   };
 
+  // Get the list color for the current todo
+  const getListColor = () => {
+    if (!todo.list_id) return null;
+    const list = lists.find((l) => l.id === todo.list_id);
+    return list?.color || null;
+  };
+
   return (
     <li
       className={`p-3 ${getPriorityColor(
         todo.priority
-      )} border border-l-4 border-border rounded flex bg-background/50 hover:bg-accent transition-colors`}
+      )} border border-l-4 md:border-l-6 border-border rounded flex bg-card shadow-md hover:bg-accent transition-colors`}
     >
       <div
         className="w-full flex flex-col space-y-2"
@@ -148,13 +153,13 @@ function TodoListItem({
         {/*list title, detail, date/time and list name */}
         <div className="flex justify-between items-start">
           <div className="flex flex-col">
-            <span className={`text-sm font-medium text-card-foreground ${todo.completed ? 'line-through opacity-60' : ''}`}>
+            <p className={`capitalize font-medium text-card-foreground ${todo.completed ? 'line-through opacity-60' : ''}`}>
               {todo.title}
-            </span>
+            </p>
             {todo.detail && (
-              <span className={`text-xs text-muted-foreground mt-1 line-clamp-2 ${todo.completed ? 'line-through opacity-60' : ''}`}>
+              <p className={`text-xs text-muted-foreground mt-1 line-clamp-2 ${todo.completed ? 'line-through opacity-60' : ''}`}>
                 {todo.detail}
-              </span>
+              </p>
             )}
             {/* Due date and time */}
             <div className="flex items-center gap-3">
@@ -166,7 +171,15 @@ function TodoListItem({
                 </div>
               )}
               {todo.list_name && (
-                <Badge variant="outline" className="text-xs">
+                <Badge
+                  variant="outline"
+                  className="text-xs"
+                  style={getListColor() ? {
+                    backgroundColor: getListColor()!,
+                    borderColor: getListColor()!,
+                    color: 'white'
+                  } : undefined}
+                >
                   {todo.list_name}
                 </Badge>
               )}
@@ -174,101 +187,89 @@ function TodoListItem({
           </div>
         </div>
       </div>
-      <Popover open={popoverOpen} onOpenChange={setPopoverOpen}>
-        <PopoverTrigger asChild>
+      <DropdownMenu open={dropdownOpen} onOpenChange={setDropdownOpen}>
+        <DropdownMenuTrigger asChild>
           <div className="hidden md:flex cursor-pointer items-start">
             <EllipsisVertical className="h-4 w-4 text-muted-foreground" />
           </div>
-        </PopoverTrigger>
-        <PopoverContent className="w-56 p-0" align="end">
-          <div className="p-2 space-y-1">
-            {/* Add to List */}
-            <div className="p-2">
-              <label className="text-xs text-muted-foreground mb-1 block">
+        </DropdownMenuTrigger>
+        <DropdownMenuContent align="end" className="w-56">
+          {/* Move to List Section */}
+          {lists.filter((list) => list.id !== todo.list_id).length > 0 && (
+            <>
+              <div className="px-2 py-1.5 text-xs font-medium text-muted-foreground">
                 Move to list
-              </label>
-              <Select
-                onValueChange={(listId) => {
-                  moveTodoMutation.mutate({
-                    todoId: todo.id,
-                    listId: parseInt(listId),
-                  });
-                }}
-              >
-                <SelectContent>
-                  {lists
-                    .filter((list) => list.id !== todo.list_id)
-                    .map((list) => (
-                      <SelectItem key={list.id} value={list.id.toString()}>
+              </div>
+              <ul className="py-1">
+                {lists
+                  .filter((list) => list.id !== todo.list_id)
+                  .map((list) => (
+                    <li key={list.id}>
+                      <button
+                        onClick={() => {
+                          moveTodoMutation.mutate({
+                            todoId: todo.id,
+                            listId: list.id,
+                          });
+                        }}
+                        className="w-full text-left px-2 py-1.5 text-sm hover:bg-accent hover:text-accent-foreground rounded-sm cursor-pointer"
+                      >
                         {list.name}
-                      </SelectItem>
-                    ))}
-                  {lists.filter((list) => list.id !== todo.list_id).length ===
-                    0 && (
-                    <option disabled className="text-xs text-muted-foreground">
-                      No other lists available
-                    </option>
-                  )}
-                </SelectContent>
-              </Select>
-            </div>
+                      </button>
+                    </li>
+                  ))}
+              </ul>
+              <div className="bg-border -mx-1 my-1 h-px" />
+            </>
+          )}
 
-            {/* Remove from list  */}
+          {/* Duplicate Task */}
+          <button
+            onClick={handleDuplicate}
+            disabled={duplicateTodoMutation.isPending}
+            className="relative flex w-full cursor-default items-center gap-2 rounded-sm px-2 py-1.5 text-sm outline-hidden select-none hover:bg-accent hover:text-accent-foreground disabled:pointer-events-none disabled:opacity-50"
+          >
+            <Copy className="h-4 w-4" />
+            <span>{duplicateTodoMutation.isPending ? "Duplicating..." : "Duplicate Task"}</span>
+          </button>
 
-            {/* Divider */}
-            <div className="border-t border-border" />
-
-            <Button
-              variant="ghost"
-              size="sm"
-              className="w-full justify-start text-sm"
-              onClick={handleDuplicate}
-              disabled={duplicateTodoMutation.isPending}
-            >
-              <Copy className="h-4 w-4 mr-2" />
-              {duplicateTodoMutation.isPending ? "Duplicating..." : "Duplicate Task"}
-            </Button>
-
-            {/* Mark as completed */}
-            <Button
-              variant="ghost"
-              size="sm"
-              className="w-full justify-start text-sm"
-              onClick={handleToggleCompletion}
-              disabled={toggleCompletionMutation.isPending}
-            >
-              <Calendar className="h-4 w-4 mr-2" />
+          {/* Mark as completed/pending */}
+          <button
+            onClick={handleToggleCompletion}
+            disabled={toggleCompletionMutation.isPending}
+            className="relative flex w-full cursor-default items-center gap-2 rounded-sm px-2 py-1.5 text-sm outline-hidden select-none hover:bg-accent hover:text-accent-foreground disabled:pointer-events-none disabled:opacity-50"
+          >
+            <Calendar className="h-4 w-4" />
+            <span>
               {toggleCompletionMutation.isPending
                 ? "Updating..."
                 : todo.completed
                 ? "Mark as Pending"
                 : "Mark as Completed"}
-            </Button>
+            </span>
+          </button>
 
-            {/* Edit Button */}
-            <Button
-              variant="ghost"
-              size="sm"
-              className="w-full justify-start text-sm"
-              onClick={() => openSidebar(todo)}
-            >
-              <Edit2 className="h-4 w-4 mr-2" />
-              Edit
-            </Button>
+          {/* Edit */}
+          <button
+            onClick={() => openSidebar(todo)}
+            className="relative flex w-full cursor-default items-center gap-2 rounded-sm px-2 py-1.5 text-sm outline-hidden select-none hover:bg-accent hover:text-accent-foreground"
+          >
+            <Edit2 className="h-4 w-4" />
+            <span>Edit</span>
+          </button>
 
-            {/* Delete Button */}
-            <Button
-              variant="ghost"
-              size="sm"
-              className="w-full justify-start text-sm text-destructive hover:text-destructive hover:bg-destructive/10"
-              onClick={handleDelete}
-            >
-              <Trash2 className="h-4 w-4 mr-2" />
-              Move to trash
-            </Button>
-          </div>
-        </PopoverContent>
-      </Popover>
+          <div className="bg-border -mx-1 my-1 h-px" />
+
+          {/* Delete */}
+          <button
+            onClick={handleDelete}
+            className="relative flex w-full cursor-default items-center gap-2 rounded-sm px-2 py-1.5 text-sm outline-hidden select-none text-destructive hover:bg-destructive/10 hover:text-destructive"
+          >
+            <Trash2 className="h-4 w-4" />
+            <span>Move to trash</span>
+          </button>
+        </DropdownMenuContent>
+      </DropdownMenu>
     </li>
   );
 }

@@ -1,4 +1,4 @@
-import { useState, useEffect, useMemo } from "react";
+import { useState, useEffect, useMemo, useRef } from "react";
 import {
   ArrowUpNarrowWide,
   BadgeIcon,
@@ -86,6 +86,9 @@ export const TaskItem = ({
   // Determine if we're in create or edit mode
   const isEditMode = todo !== null;
 
+  // Create ref for title input to handle auto-focus
+  const titleInputRef = useRef<HTMLInputElement>(null);
+
   // Initialize form when todo changes
   useEffect(() => {
     if (todo) {
@@ -126,6 +129,16 @@ export const TaskItem = ({
       setCompleted(false);
       setOriginalValues(null);
     }
+  }, [todo]);
+
+  // Focus title input when component mounts or todo changes
+  useEffect(() => {
+    // Small delay to ensure Sheet animation completes and form is initialized
+    const timeoutId = setTimeout(() => {
+      titleInputRef.current?.focus();
+    }, 100);
+
+    return () => clearTimeout(timeoutId);
   }, [todo]);
 
   // Detect if form has changes
@@ -289,6 +302,7 @@ export const TaskItem = ({
       {/* Title */}
       <div className="">
         <Input
+          ref={titleInputRef}
           type="text"
           id="title"
           value={title}
@@ -483,7 +497,7 @@ export const TaskItem = ({
           />
         </div>
       </div>
-
+      <Separator className="my-4" />
       {/* Save Button - Only show when there are changes */}
       {hasChanges && (
         <div className="flex justify-end">

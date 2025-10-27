@@ -30,8 +30,8 @@ export default function RootLayout({
         <QueryProvider>
           <ThemeProvider>
             <SidebarProvider>
-              <main className="min-h-screen bg-background transition-colors">
-                <header className="flex justify-between items-center p-4 md:p-6 lg:px-20 lg:py-12">
+              <main className="min-h-screen bg-background transition-colors pt-20 md:pt-24 lg:pt-32">
+                <header className="flex justify-between items-center p-4 md:p-6 lg:px-20 lg:py-12 fixed top-0 left-0 right-0 z-50">
                   <Link href="/">
                   <h1 className="md:text-2xl font-kaushan text-xl font-bold text-foreground">
                     Kachi's <span className="text-amber-700 text-3xl">ToDo</span>

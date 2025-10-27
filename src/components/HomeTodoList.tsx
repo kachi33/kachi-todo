@@ -301,7 +301,6 @@ function HomeTodoList({ mockState = null }: HomeTodoListProps): React.JSX.Elemen
             ))}
           </ul>
 
-          {hasMoreTodos && (
             <div className="pt-6 border-t border-border">
               <Link href="/tasks">
                 <Button variant="outline" className="w-full" size="sm">
@@ -309,8 +308,8 @@ function HomeTodoList({ mockState = null }: HomeTodoListProps): React.JSX.Elemen
                   <ArrowRight className="h-4 w-4 mr-2" />
                 </Button>
               </Link>
+              
             </div>
-          )}
         </div>
       )}
     </div>
