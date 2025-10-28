@@ -1,9 +1,9 @@
 import { useState, useEffect } from "react";
 import {
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
-} from "@/components/ui/popover";
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Label } from "@/components/ui/label";
@@ -118,19 +118,16 @@ function FilterModal({
   const priorities = ["urgent", "high", "medium", "low"];
 
   return (
-    <Popover open={open} onOpenChange={onOpenChange}>
-      <PopoverTrigger asChild>
+    <DropdownMenu open={open} onOpenChange={onOpenChange}>
+      <DropdownMenuTrigger asChild>
         {children}
-      </PopoverTrigger>
-      <PopoverContent className="w-96 p-0" align="end">
+      </DropdownMenuTrigger>
+      <DropdownMenuContent className="w-96 p-0" align="end">
         <div className="p-4 border-b">
           <h3 className="text-lg font-semibold">Filter Tasks</h3>
-          <p className="text-sm text-muted-foreground">
-            Apply filters to organize your tasks
-          </p>
         </div>
 
-        <div className="space-y-6 p-4 max-h-[400px] overflow-y-auto">
+        <div className="space-y-6 p-4 max-h-[60vh] overflow-y-auto">
           {/* Priority Filter */}
           <div className="space-y-3">
             <Label className="text-sm font-semibold">Priority</Label>
@@ -223,8 +220,8 @@ function FilterModal({
             Apply Filters
           </Button>
         </div>
-      </PopoverContent>
-    </Popover>
+      </DropdownMenuContent>
+    </DropdownMenu>
   );
 }
 

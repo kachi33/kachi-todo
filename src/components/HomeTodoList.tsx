@@ -1,6 +1,14 @@
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
-import { Calendar, ArrowRight, Plus, Divide, ListTodo, AlertCircle, RefreshCw } from "lucide-react";
+import {
+  Calendar,
+  ArrowRight,
+  Plus,
+  Divide,
+  ListTodo,
+  AlertCircle,
+  RefreshCw,
+} from "lucide-react";
 import {
   Empty,
   EmptyHeader,
@@ -20,15 +28,17 @@ import { Separator } from "@/components/ui/separator";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useState } from "react";
 
-export type MockState = 'loading' | 'error' | 'empty' | 'content' | null;
+export type MockState = "loading" | "error" | "empty" | "content" | null;
 
 interface HomeTodoListProps {
   mockState?: MockState;
 }
 
-function HomeTodoList({ mockState = null }: HomeTodoListProps): React.JSX.Element {
+function HomeTodoList({
+  mockState = null,
+}: HomeTodoListProps): React.JSX.Element {
   const [forceLoading, setForceLoading] = useState(false);
-  
+
   const {
     data: todos = [],
     isLoading,
@@ -40,10 +50,16 @@ function HomeTodoList({ mockState = null }: HomeTodoListProps): React.JSX.Elemen
   });
 
   // Override states with mockState if provided
-  const showLoading = mockState === 'loading' ? true : (mockState === null ? (isLoading || forceLoading) : false);
-  const showError = mockState === 'error' ? true : (mockState === null ? isError : false);
-  const showEmpty = mockState === 'empty' ? true : false;
-  const showContent = mockState === 'content' ? true : false;
+  const showLoading =
+    mockState === "loading"
+      ? true
+      : mockState === null
+      ? isLoading || forceLoading
+      : false;
+  const showError =
+    mockState === "error" ? true : mockState === null ? isError : false;
+  const showEmpty = mockState === "empty" ? true : false;
+  const showContent = mockState === "content" ? true : false;
 
   const { openSidebar, openCreateMode } = useSidebar();
 
@@ -62,29 +78,12 @@ function HomeTodoList({ mockState = null }: HomeTodoListProps): React.JSX.Elemen
     }
   };
 
-  const getTODOStatusColor = (completed: boolean) => {
-    return completed ? "border-l-green-500" : "border-l-yellow-500";
-  };
-
   if (showLoading) {
     return (
       <div className="flex flex-col gap-3 lg:gap-6">
         <div className="flex items-center  justify-between">
-          <h2 className="text-xl font-semibold text-card-foreground">
-            Upcoming Tasks
-          </h2>
-          <div className="flex justify-between items-center gap-2">
-            <Button
-              variant="outline"
-              size="lg"
-              className="cursor-pointer"
-              onClick={openCreateMode}
-              title="Create new todo"
-            >
-              <Plus className="h-4 w-4" />
-              Add New Task
-            </Button>
-          </div>
+          <Skeleton className="h-10 w-36 rounded-md" />
+            <Skeleton className="h-10 w-32 rounded-md" />
         </div>
         <div className="text-muted-foreground">
           <Separator className="" />
@@ -92,13 +91,11 @@ function HomeTodoList({ mockState = null }: HomeTodoListProps): React.JSX.Elemen
             <OfflineStatus />
           </div>
         </div>
-          <div className="flex items-center space-x-4">
-            <Skeleton className="h-12 w-12 rounded-full" />
-            <div className="space-y-2">
-              <Skeleton className="h-4 w-[250px]" />
-              <Skeleton className="h-4 w-[200px]" />
-            </div>
-          </div>
+        <div className="space-y-2 p-2 md:px-4">
+          <Skeleton className="h-18 w-full rounded-lg" />
+          <Skeleton className="h-18 w-full rounded-lg" />
+          <Skeleton className="h-18 w-full rounded-lg" />
+        </div>
       </div>
     );
   }
@@ -138,7 +135,8 @@ function HomeTodoList({ mockState = null }: HomeTodoListProps): React.JSX.Elemen
             Failed to Load Tasks
           </h3>
           <p className="text-center text-muted-foreground mb-6 max-w-md">
-            We couldn't retrieve your tasks. Please check your connection and try again.
+            We couldn't retrieve your tasks. Please check your connection and
+            try again.
           </p>
 
           {/* Retry Button */}
@@ -166,7 +164,7 @@ function HomeTodoList({ mockState = null }: HomeTodoListProps): React.JSX.Elemen
     if (todo.due_date) {
       const dueDateTime = new Date(todo.due_date);
       if (todo.due_time) {
-        const [hours, minutes] = todo.due_time.split(':');
+        const [hours, minutes] = todo.due_time.split(":");
         dueDateTime.setHours(parseInt(hours), parseInt(minutes));
       }
       // Exclude if overdue (past due date)
@@ -184,30 +182,30 @@ function HomeTodoList({ mockState = null }: HomeTodoListProps): React.JSX.Elemen
     pendingTodos = [
       {
         id: 1,
-        title: 'Sample Task 1',
-        detail: 'This is a sample task for demonstration',
+        title: "Sample Task 1",
+        detail: "This is a sample task for demonstration",
         completed: false,
-        priority: 'high',
-        due_date: new Date(Date.now() + 86400000).toISOString().split('T')[0],
-        due_time: '10:00',
-        userId: 'demo-user',
+        priority: "high",
+        due_date: new Date(Date.now() + 86400000).toISOString().split("T")[0],
+        due_time: "10:00",
+        userId: "demo-user",
       },
       {
         id: 2,
-        title: 'Sample Task 2',
-        detail: 'Another sample task',
+        title: "Sample Task 2",
+        detail: "Another sample task",
         completed: false,
-        priority: 'medium',
-        due_date: new Date(Date.now() + 172800000).toISOString().split('T')[0],
-        userId: 'demo-user',
+        priority: "medium",
+        due_date: new Date(Date.now() + 172800000).toISOString().split("T")[0],
+        userId: "demo-user",
       },
       {
         id: 3,
-        title: 'Sample Task 3',
-        detail: 'One more sample task',
+        title: "Sample Task 3",
+        detail: "One more sample task",
         completed: false,
-        priority: 'low',
-        userId: 'demo-user',
+        priority: "low",
+        userId: "demo-user",
       },
     ] as Todo[];
   }
@@ -219,11 +217,11 @@ function HomeTodoList({ mockState = null }: HomeTodoListProps): React.JSX.Elemen
       const dateA = new Date(a.due_date);
       const dateB = new Date(b.due_date);
       if (a.due_time) {
-        const [hours, minutes] = a.due_time.split(':');
+        const [hours, minutes] = a.due_time.split(":");
         dateA.setHours(parseInt(hours), parseInt(minutes));
       }
       if (b.due_time) {
-        const [hours, minutes] = b.due_time.split(':');
+        const [hours, minutes] = b.due_time.split(":");
         dateB.setHours(parseInt(hours), parseInt(minutes));
       }
       return dateA.getTime() - dateB.getTime();
@@ -282,14 +280,10 @@ function HomeTodoList({ mockState = null }: HomeTodoListProps): React.JSX.Elemen
           </EmptyHeader>
           <EmptyContent className="mt-2">
             <Link href="/tasks">
-            <Button
-              variant="default"
-              size="default"
-              className=""
-            >
-              <Plus className="h-4 w-4" />
-              Add New Task
-            </Button>
+              <Button variant="default" size="default" className="">
+                <Plus className="h-4 w-4" />
+                Add New Task
+              </Button>
             </Link>
           </EmptyContent>
         </Empty>
@@ -301,15 +295,14 @@ function HomeTodoList({ mockState = null }: HomeTodoListProps): React.JSX.Elemen
             ))}
           </ul>
 
-            <div className="pt-6 border-t border-border">
-              <Link href="/tasks">
-                <Button variant="outline" className="w-full" size="sm">
-                  See All Task 
-                  <ArrowRight className="h-4 w-4 mr-2" />
-                </Button>
-              </Link>
-              
-            </div>
+          <div className="pt-6 border-t border-border">
+            <Link href="/tasks">
+              <Button variant="outline" className="w-full" size="sm">
+                See All Task
+                <ArrowRight className="h-4 w-4 mr-2" />
+              </Button>
+            </Link>
+          </div>
         </div>
       )}
     </div>
