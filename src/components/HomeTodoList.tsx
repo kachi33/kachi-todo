@@ -8,6 +8,7 @@ import {
   ListTodo,
   AlertCircle,
   RefreshCw,
+  ChevronRight,
 } from "lucide-react";
 import {
   Empty,
@@ -83,7 +84,7 @@ function HomeTodoList({
       <div className="flex flex-col gap-3 lg:gap-6">
         <div className="flex items-center  justify-between">
           <Skeleton className="h-10 w-36 rounded-md" />
-            <Skeleton className="h-10 w-32 rounded-md" />
+          <Skeleton className="h-10 w-32 rounded-md" />
         </div>
         <div className="text-muted-foreground">
           <Separator className="" />
@@ -266,7 +267,7 @@ function HomeTodoList({
       </div>
       {/* <div className="bg-card border border-border rounded-lg p-6"> */}
       {pendingTodos.length === 0 ? (
-        <Empty className="from-muted/50 to-background h-full bg-linear-to-b from-30%">
+        <Empty className="from-muted/50 to-background shadow-lg h-full bg-linear-to-b from-30%">
           <EmptyHeader className="">
             <EmptyMedia variant="icon" className="">
               <ListTodo />
@@ -278,11 +279,21 @@ function HomeTodoList({
                 : "Great job! All your tasks are complete. Ready for more?"}
             </EmptyDescription>
           </EmptyHeader>
-          <EmptyContent className="mt-2">
+          <EmptyContent className="mt-2 flex flex-row gap-3 items-center justify-center">
+            <Button
+              variant="default"
+              size="default"
+              onClick={openCreateMode}
+              className="flex items-center gap-2"
+            >
+              <Plus className="h-4 w-4" />
+              Add New Task
+            </Button>
+
             <Link href="/tasks">
-              <Button variant="default" size="default" className="">
-                <Plus className="h-4 w-4" />
-                Add New Task
+              <Button variant="outline" size="default" className="flex items-center gap-2">
+                View all Tasks
+                <ChevronRight className="h-4 w-4" />
               </Button>
             </Link>
           </EmptyContent>

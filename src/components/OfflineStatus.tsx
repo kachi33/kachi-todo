@@ -1,41 +1,55 @@
 'use client';
 
-import { useNetworkStatus } from '@/hooks/useNetworkStatus';
+import { useSyncStatus } from '@/hooks/useSyncStatus';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { Wifi, WifiOff, RefreshCw, AlertCircle } from 'lucide-react';
-import { useState, useEffect, useRef } from 'react';
+import { Wifi, WifiOff, RefreshCw, AlertCircle, Check, Loader2, Cloud, XCircle, ChevronRight } from 'lucide-react';
+import { useState, useEffect } from 'react';
+import { toast } from 'sonner';
+import { syncManager } from '@/lib/syncManager';
+import { SyncStatusPanel } from '@/components/SyncStatusPanel';
 
 const OfflineStatus = () => {
-  const { isOnline, syncInProgress, lastSyncTime, forceSync } = useNetworkStatus();
+  const { status, isOnline, isSyncing, pendingCount, lastSyncTime, lastError, sync } = useSyncStatus();
   const [mounted, setMounted] = useState(false);
-  const [isSpinning, setIsSpinning] = useState(false);
-  const spinStartTimeRef = useRef<number | null>(null);
+  const [isPanelOpen, setIsPanelOpen] = useState(false);
 
   useEffect(() => {
     setMounted(true);
   }, []);
 
-  useEffect(() => {
-    if (syncInProgress) {
-      // Sync started - record the time and start spinning
-      if (!spinStartTimeRef.current) {
-        spinStartTimeRef.current = Date.now();
-      }
-      setIsSpinning(true);
-    } else if (spinStartTimeRef.current) {
-      // Sync completed - check if 3 seconds have passed
-      const elapsed = Date.now() - spinStartTimeRef.current;
-      const remaining = Math.max(0, 3000 - elapsed);
-
-      const timer = setTimeout(() => {
-        setIsSpinning(false);
-        spinStartTimeRef.current = null;
-      }, remaining);
-
-      return () => clearTimeout(timer);
+  const handleManualSync = async () => {
+    if (!isOnline) {
+      toast.error('Cannot sync while offline');
+      return;
     }
-  }, [syncInProgress]);
+
+    if (isSyncing) {
+      toast.info('Sync already in progress');
+      return;
+    }
+
+    try {
+      await sync();
+      if (pendingCount === 0) {
+        toast.success('All tasks synced successfully!');
+      }
+    } catch (error) {
+      toast.error(lastError || 'Sync failed');
+    }
+  };
+
+  const handleClearQueue = async () => {
+    if (confirm('Clear all pending sync items? This will remove items from the sync queue. This action cannot be undone.')) {
+      try {
+        await syncManager.clearSyncQueue();
+        toast.success('Sync queue cleared');
+        window.location.reload(); // Reload to refresh state
+      } catch (error) {
+        toast.error('Failed to clear sync queue');
+      }
+    }
+  };
 
   // Don't render anything on server to avoid hydration mismatch
   if (!mounted) {
@@ -63,48 +77,123 @@ const OfflineStatus = () => {
     return `${days}d ago`;
   };
 
-  const getStatusColor = () => {
-    if (!isOnline) return 'bg-red-100 text-red-800 border-red-200';
-    if (syncInProgress) return 'bg-yellow-100 text-yellow-800 border-yellow-200';
-    return 'bg-blue-100 text-blue-800 border-blue-200';
+  const getStatusConfig = () => {
+    switch (status) {
+      case 'offline':
+        return {
+          color: 'bg-red-100 text-red-800 border-red-200',
+          dotColor: 'bg-red-500',
+          icon: WifiOff,
+          label: 'Offline',
+          message: 'Changes saved locally',
+          showSync: false,
+        };
+      case 'syncing':
+        return {
+          color: 'bg-yellow-100 text-yellow-800 border-yellow-200',
+          dotColor: 'bg-yellow-500 animate-pulse',
+          icon: Loader2,
+          label: 'Syncing',
+          message: `Syncing ${pendingCount} ${pendingCount === 1 ? 'item' : 'items'}...`,
+          showSync: false,
+        };
+      case 'failed':
+        return {
+          color: 'bg-orange-100 text-orange-800 border-orange-200',
+          dotColor: 'bg-orange-500',
+          icon: AlertCircle,
+          label: 'Sync Failed',
+          message: `${pendingCount} ${pendingCount === 1 ? 'item' : 'items'} pending`,
+          showSync: true,
+        };
+      case 'synced':
+        return {
+          color: 'bg-green-100 text-green-800 border-green-200',
+          dotColor: 'bg-green-500',
+          icon: Check,
+          label: 'Synced',
+          message: lastSyncTime ? `Last sync: ${formatLastSync(lastSyncTime)}` : 'All synced',
+          showSync: pendingCount > 0,
+        };
+      case 'online':
+      default:
+        return {
+          color: 'bg-blue-100 text-blue-800 border-blue-200',
+          dotColor: 'bg-blue-500',
+          icon: Wifi,
+          label: 'Online',
+          message: lastSyncTime ? `Last sync: ${formatLastSync(lastSyncTime)}` : 'Connected',
+          showSync: pendingCount > 0,
+        };
+    }
   };
 
-  const getStatusIcon = () => {
-    if (!isOnline) return <WifiOff className="h-3 w-3" />;
-    return <Wifi className="h-3 w-3" />;
-  };
+  const config = getStatusConfig();
+  const StatusIcon = config.icon;
 
   return (
-    <div className="flex items-center gap-1 text-xs">
-
-      {!isOnline && (
-        <div className="flex items-center gap-1 text-muted-foreground">
-          <AlertCircle className="h-3 w-3" />
-          <span>Changes saved locally</span>
-        </div>
-      )}
-
-      {isOnline && lastSyncTime && (
-        <div className="flex items-center gap-1 text-muted-foreground">
-          <span>Last sync: {formatLastSync(lastSyncTime)}</span>
-        </div>
-      )}
-
-      {isOnline && (
-        <Button
-          variant="ghost"
-          size="sm"
-          onClick={forceSync}
-          disabled={isSpinning}
-          className="h-6 px-2 text-xs"
+    <>
+      <div className="flex items-center gap-2 text-xs">
+        {/* Status Message - Clickable to open panel */}
+        <button
+          onClick={() => setIsPanelOpen(true)}
+          className="flex items-center gap-1.5 text-muted-foreground hover:text-foreground transition-colors cursor-pointer group"
+          title="View sync details"
         >
-          <RefreshCw className={`h-3 w-3 ${isSpinning ? 'animate-spin' : ''}`} />
-        </Button>
+          <StatusIcon className={`h-3.5 w-3.5 ${isSyncing ? 'animate-spin' : ''}`} />
+          <span>{config.message}</span>
+          <ChevronRight className="h-3 w-3 opacity-0 group-hover:opacity-100 transition-opacity" />
+        </button>
+
+      {/* Pending Count Badge */}
+      {pendingCount > 0 && !isSyncing && (
+        <Badge variant="outline" className="bg-orange-50 text-orange-700 border-orange-200 px-1.5 py-0 text-xs">
+          {pendingCount}
+        </Badge>
       )}
-      <Badge className={`${getStatusColor()} flex rounded-full items-center justify-center w-3 h-3 p-0 m-0`}>
-        {getStatusIcon()}
-      </Badge>
+
+      {/* Manual Sync Button */}
+      {config.showSync && (
+        <>
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={handleManualSync}
+            disabled={isSyncing}
+            className="h-6 px-2 text-xs"
+            title="Sync now"
+          >
+            <RefreshCw className={`h-3 w-3 ${isSyncing ? 'animate-spin' : ''}`} />
+            <span className="ml-1">Sync</span>
+          </Button>
+
+          {/* Clear Queue Button - only show if there are pending items */}
+          {pendingCount > 0 && (
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={handleClearQueue}
+              disabled={isSyncing}
+              className="h-6 px-2 text-xs text-destructive hover:text-destructive hover:bg-destructive/10"
+              title="Clear sync queue"
+            >
+              <XCircle className="h-3 w-3" />
+            </Button>
+          )}
+        </>
+      )}
+
+      {/* Status Dot Indicator */}
+      <button
+        onClick={() => setIsPanelOpen(true)}
+        className={`h-2 w-2 rounded-full ${config.dotColor} cursor-pointer hover:scale-125 transition-transform`}
+        title={`${config.label} - Click for details`}
+      />
     </div>
+
+    {/* Sync Status Panel */}
+    <SyncStatusPanel isOpen={isPanelOpen} onClose={() => setIsPanelOpen(false)} />
+    </>
   );
 };
 

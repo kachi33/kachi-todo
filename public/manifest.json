@@ -1,12 +1,13 @@
 {
-  "name": "Kachi Todo App",
+  "name": "Kachi Todo - Personal Task Manager",
   "short_name": "Kachi Todo",
-  "description": "A modern todo app with offline sync capabilities",
+  "description": "A modern todo app with powerful offline sync capabilities. Create, manage, and sync your tasks seamlessly.",
   "start_url": "/",
   "display": "standalone",
   "background_color": "#ffffff",
   "theme_color": "#000000",
   "orientation": "portrait-primary",
+  "categories": ["productivity", "utilities"],
   "icons": [
     {
       "src": "/favicon-16x16.png",
@@ -29,6 +30,32 @@
       "sizes": "512x512",
       "type": "image/png",
       "purpose": "any maskable"
+    }
+  ],
+  "shortcuts": [
+    {
+      "name": "Create Task",
+      "short_name": "New Task",
+      "description": "Quickly create a new task",
+      "url": "/?action=create",
+      "icons": [
+        {
+          "src": "/android-chrome-192x192.png",
+          "sizes": "192x192"
+        }
+      ]
+    },
+    {
+      "name": "View All Tasks",
+      "short_name": "All Tasks",
+      "description": "View all your tasks",
+      "url": "/tasks",
+      "icons": [
+        {
+          "src": "/android-chrome-192x192.png",
+          "sizes": "192x192"
+        }
+      ]
     }
   ]
 }

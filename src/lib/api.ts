@@ -11,11 +11,41 @@ const createAuthHeaders = async () => {
   };
 };
 
+/**
+ * Wrapper for fetch that adds a timeout to fail fast when offline
+ * @param url - The URL to fetch
+ * @param options - Fetch options
+ * @param timeout - Timeout in milliseconds (default: 5000)
+ */
+const fetchWithTimeout = async (
+  url: string,
+  options: RequestInit = {},
+  timeout: number = 5000
+): Promise<Response> => {
+  const controller = new AbortController();
+  const timeoutId = setTimeout(() => controller.abort(), timeout);
+
+  try {
+    const response = await fetch(url, {
+      ...options,
+      signal: controller.signal,
+    });
+    clearTimeout(timeoutId);
+    return response;
+  } catch (error) {
+    clearTimeout(timeoutId);
+    if (error instanceof Error && error.name === 'AbortError') {
+      throw new Error('Request timeout - server unreachable');
+    }
+    throw error;
+  }
+};
+
 // === Todos Methods ===
 export const fetchTodos = async (listId?: number): Promise<Todo[]> => {
   const headers = await createAuthHeaders();
   const url = listId ? `${BASE_URL}/api/todos?list_id=${listId}` : `${BASE_URL}/api/todos`;
-  const res = await fetch(url, {
+  const res = await fetchWithTimeout(url, {
     headers,
   });
   if (!res.ok) throw new Error('Failed to fetch todos');
@@ -24,7 +54,7 @@ export const fetchTodos = async (listId?: number): Promise<Todo[]> => {
 
 export const fetchTodoById = async (id: string | number): Promise<Todo> => {
   const headers = await createAuthHeaders();
-  const res = await fetch(`${BASE_URL}/api/todos/${id}`, {
+  const res = await fetchWithTimeout(`${BASE_URL}/api/todos/${id}`, {
     headers,
   });
   if (!res.ok) throw new Error('Failed to fetch todo');
@@ -33,7 +63,7 @@ export const fetchTodoById = async (id: string | number): Promise<Todo> => {
 
 export const createTodo = async (todo: CreateTodoData): Promise<Todo> => {
   const headers = await createAuthHeaders();
-  const res = await fetch(`${BASE_URL}/api/todos`, {
+  const res = await fetchWithTimeout(`${BASE_URL}/api/todos`, {
     method: 'POST',
     headers,
     body: JSON.stringify(todo),
@@ -44,7 +74,7 @@ export const createTodo = async (todo: CreateTodoData): Promise<Todo> => {
 
 export const updateTodo = async (id: number, todo: Partial<CreateTodoData>): Promise<Todo> => {
   const headers = await createAuthHeaders();
-  const res = await fetch(`${BASE_URL}/api/todos/${id}`, {
+  const res = await fetchWithTimeout(`${BASE_URL}/api/todos/${id}`, {
     method: 'PUT',
     headers,
     body: JSON.stringify(todo),
@@ -55,7 +85,7 @@ export const updateTodo = async (id: number, todo: Partial<CreateTodoData>): Pro
 
 export const deleteTodo = async (id: number): Promise<void> => {
   const headers = await createAuthHeaders();
-  const res = await fetch(`${BASE_URL}/api/todos/${id}`, {
+  const res = await fetchWithTimeout(`${BASE_URL}/api/todos/${id}`, {
     method: 'DELETE',
     headers,
   });
@@ -64,7 +94,7 @@ export const deleteTodo = async (id: number): Promise<void> => {
 
 export const fetchUserStats = async () => {
   const headers = await createAuthHeaders();
-  const res = await fetch(`${BASE_URL}/api/stats`, {
+  const res = await fetchWithTimeout(`${BASE_URL}/api/stats`, {
     headers,
   });
   if (!res.ok) throw new Error('Failed to fetch user stats');
@@ -74,7 +104,7 @@ export const fetchUserStats = async () => {
 // === TodoList Methods ===
 export const fetchTodoLists = async (): Promise<TodoList[]> => {
   const headers = await createAuthHeaders();
-  const res = await fetch(`${BASE_URL}/api/lists`, {
+  const res = await fetchWithTimeout(`${BASE_URL}/api/lists`, {
     headers,
   });
   if (!res.ok) throw new Error('Failed to fetch todo lists');
@@ -83,7 +113,7 @@ export const fetchTodoLists = async (): Promise<TodoList[]> => {
 
 export const createTodoList = async (listData: CreateTodoListData): Promise<TodoList> => {
   const headers = await createAuthHeaders();
-  const res = await fetch(`${BASE_URL}/api/lists`, {
+  const res = await fetchWithTimeout(`${BASE_URL}/api/lists`, {
     method: 'POST',
     headers,
     body: JSON.stringify(listData),
@@ -94,7 +124,7 @@ export const createTodoList = async (listData: CreateTodoListData): Promise<Todo
 
 export const updateTodoList = async (id: number, listData: Partial<CreateTodoListData>): Promise<TodoList> => {
   const headers = await createAuthHeaders();
-  const res = await fetch(`${BASE_URL}/api/lists/${id}`, {
+  const res = await fetchWithTimeout(`${BASE_URL}/api/lists/${id}`, {
     method: 'PUT',
     headers,
     body: JSON.stringify(listData),
@@ -109,7 +139,7 @@ export const updateTodoList = async (id: number, listData: Partial<CreateTodoLis
 
 export const deleteTodoList = async (id: number): Promise<void> => {
   const headers = await createAuthHeaders();
-  const res = await fetch(`${BASE_URL}/api/lists/${id}`, {
+  const res = await fetchWithTimeout(`${BASE_URL}/api/lists/${id}`, {
     method: 'DELETE',
     headers,
   });

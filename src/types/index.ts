@@ -63,3 +63,19 @@ export interface ProductivityStats {
   active_streak: number;
   total_productivity_score: number;
 }
+
+// Sync History Types
+export type SyncHistoryStatus = 'success' | 'failed' | 'conflict';
+export type SyncHistoryOperation = 'create' | 'update' | 'delete' | 'sync';
+
+export interface SyncHistoryItem {
+  id: string;
+  operation: SyncHistoryOperation;
+  status: SyncHistoryStatus;
+  timestamp: number;
+  itemType: 'todo' | 'list';
+  itemId?: number;
+  itemTitle?: string;
+  error?: string;
+  duration?: number; // in milliseconds
+}

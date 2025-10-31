@@ -1,4 +1,4 @@
-import { Todo, TodoList } from '@/types';
+import { Todo, TodoList, SyncHistoryItem } from '@/types';
 
 interface SyncRecord {
   id: string;
@@ -19,8 +19,9 @@ interface OfflineData {
 
 class OfflineStorageManager {
   private dbName = 'kachi-todo-offline';
-  private dbVersion = 1;
+  private dbVersion = 2;
   private db: IDBDatabase | null = null;
+  private readonly MAX_HISTORY_ITEMS = 50;
 
   async init(): Promise<void> {
     // Skip initialization on server-side
@@ -64,6 +65,13 @@ class OfflineStorageManager {
         // Metadata store
         if (!db.objectStoreNames.contains('metadata')) {
           db.createObjectStore('metadata', { keyPath: 'key' });
+        }
+
+        // Sync History store
+        if (!db.objectStoreNames.contains('syncHistory')) {
+          const historyStore = db.createObjectStore('syncHistory', { keyPath: 'id' });
+          historyStore.createIndex('timestamp', 'timestamp', { unique: false });
+          historyStore.createIndex('status', 'status', { unique: false });
         }
       };
     });
@@ -113,12 +121,20 @@ class OfflineStorageManager {
       offline: isOfflineChange
     };
 
+    // Save to todos store
     const transaction = this.db!.transaction(['todos'], 'readwrite');
     const store = transaction.objectStore('todos');
-    await store.put(todoWithTimestamp);
+    store.put(todoWithTimestamp);
 
-    // Add to sync queue if it's an offline change
+    // Wait for transaction to complete
+    await new Promise<void>((resolve, reject) => {
+      transaction.oncomplete = () => resolve();
+      transaction.onerror = () => reject(transaction.error);
+    });
+
+    // Add to sync queue if it's an offline change (after main transaction completes)
     if (isOfflineChange) {
+      console.log('[offlineStorage] Adding to sync queue:', todo.id);
       await this.addToSyncQueue({
         id: `todo-${todo.id}-${Date.now()}`,
         operation: todo.id < 0 ? 'create' : 'update',
@@ -128,12 +144,8 @@ class OfflineStorageManager {
         retryCount: 0,
         synced: false
       });
+      console.log('[offlineStorage] Added to sync queue successfully');
     }
-
-    return new Promise((resolve, reject) => {
-      transaction.oncomplete = () => resolve();
-      transaction.onerror = () => reject(transaction.error);
-    });
   }
 
   async deleteTodo(todoId: number, isOfflineChange = false): Promise<void> {
@@ -231,20 +243,13 @@ class OfflineStorageManager {
     const transaction = this.db!.transaction(['syncQueue'], 'readwrite');
     const store = transaction.objectStore('syncQueue');
 
-    const getRequest = store.get(syncId);
+    // Delete the item instead of marking it as synced
+    // This prevents accumulation of completed items
+    const deleteRequest = store.delete(syncId);
+
     return new Promise((resolve, reject) => {
-      getRequest.onsuccess = () => {
-        const record = getRequest.result;
-        if (record) {
-          record.synced = true;
-          const putRequest = store.put(record);
-          putRequest.onsuccess = () => resolve();
-          putRequest.onerror = () => reject(putRequest.error);
-        } else {
-          resolve();
-        }
-      };
-      getRequest.onerror = () => reject(getRequest.error);
+      deleteRequest.onsuccess = () => resolve();
+      deleteRequest.onerror = () => reject(deleteRequest.error);
     });
   }
 
@@ -301,15 +306,126 @@ class OfflineStorageManager {
     });
   }
 
+  // Sync History operations
+  async addSyncHistory(historyItem: SyncHistoryItem): Promise<void> {
+    if (!this.db) await this.init();
+
+    const transaction = this.db!.transaction(['syncHistory'], 'readwrite');
+    const store = transaction.objectStore('syncHistory');
+
+    // Add the new history item
+    store.put(historyItem);
+
+    // Get all history items sorted by timestamp (descending)
+    const index = store.index('timestamp');
+    const getAllRequest = index.getAll();
+
+    await new Promise<void>((resolve, reject) => {
+      transaction.oncomplete = () => resolve();
+      transaction.onerror = () => reject(transaction.error);
+    });
+
+    // After adding, check if we need to trim the history
+    await this.trimSyncHistory();
+  }
+
+  private async trimSyncHistory(): Promise<void> {
+    if (!this.db) await this.init();
+
+    const transaction = this.db!.transaction(['syncHistory'], 'readwrite');
+    const store = transaction.objectStore('syncHistory');
+    const index = store.index('timestamp');
+
+    // Get all items sorted by timestamp descending
+    const getAllRequest = index.getAll();
+
+    return new Promise((resolve, reject) => {
+      getAllRequest.onsuccess = () => {
+        const items = getAllRequest.result as SyncHistoryItem[];
+
+        // Sort by timestamp descending (newest first)
+        items.sort((a, b) => b.timestamp - a.timestamp);
+
+        // If we have more than MAX_HISTORY_ITEMS, delete the oldest ones
+        if (items.length > this.MAX_HISTORY_ITEMS) {
+          const itemsToDelete = items.slice(this.MAX_HISTORY_ITEMS);
+          const deleteTransaction = this.db!.transaction(['syncHistory'], 'readwrite');
+          const deleteStore = deleteTransaction.objectStore('syncHistory');
+
+          itemsToDelete.forEach(item => {
+            deleteStore.delete(item.id);
+          });
+
+          deleteTransaction.oncomplete = () => resolve();
+          deleteTransaction.onerror = () => reject(deleteTransaction.error);
+        } else {
+          resolve();
+        }
+      };
+
+      getAllRequest.onerror = () => reject(getAllRequest.error);
+    });
+  }
+
+  async getSyncHistory(limit?: number): Promise<SyncHistoryItem[]> {
+    if (!this.db) await this.init();
+
+    const transaction = this.db!.transaction(['syncHistory'], 'readonly');
+    const store = transaction.objectStore('syncHistory');
+    const index = store.index('timestamp');
+    const request = index.getAll();
+
+    return new Promise((resolve, reject) => {
+      request.onsuccess = () => {
+        let items = request.result as SyncHistoryItem[];
+        // Sort by timestamp descending (newest first)
+        items.sort((a, b) => b.timestamp - a.timestamp);
+
+        // Apply limit if specified
+        if (limit) {
+          items = items.slice(0, limit);
+        }
+
+        resolve(items);
+      };
+      request.onerror = () => reject(request.error);
+    });
+  }
+
+  async clearSyncHistory(): Promise<void> {
+    if (!this.db) await this.init();
+
+    const transaction = this.db!.transaction(['syncHistory'], 'readwrite');
+    await transaction.objectStore('syncHistory').clear();
+
+    return new Promise((resolve, reject) => {
+      transaction.oncomplete = () => resolve();
+      transaction.onerror = () => reject(transaction.error);
+    });
+  }
+
+  async clearSyncQueue(): Promise<void> {
+    if (!this.db) await this.init();
+
+    const transaction = this.db!.transaction(['syncQueue'], 'readwrite');
+    await transaction.objectStore('syncQueue').clear();
+
+    return new Promise((resolve, reject) => {
+      transaction.oncomplete = () => resolve();
+      transaction.onerror = () => reject(transaction.error);
+    });
+  }
+
   async clearAllData(): Promise<void> {
     if (!this.db) await this.init();
 
-    const transaction = this.db!.transaction(['todos', 'todoLists', 'syncQueue', 'metadata'], 'readwrite');
+    const transaction = this.db!.transaction(['todos', 'todoLists', 'syncQueue', 'metadata', 'syncHistory'], 'readwrite');
 
     await transaction.objectStore('todos').clear();
     await transaction.objectStore('todoLists').clear();
     await transaction.objectStore('syncQueue').clear();
     await transaction.objectStore('metadata').clear();
+    await transaction.objectStore('syncHistory').clear();
 
     return new Promise((resolve, reject) => {
       transaction.oncomplete = () => resolve();

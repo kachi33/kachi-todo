@@ -12,6 +12,7 @@ import {
   DropdownMenuContent,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import { SyncBadge, SyncBadgeStatus } from "@/components/SyncBadge";
 
 function TodoListItem({
   todo,
@@ -140,6 +141,29 @@ function TodoListItem({
     return list?.color || null;
   };
 
+  // Determine sync status for this todo
+  const getSyncStatus = (): SyncBadgeStatus | null => {
+    // If todo has negative ID, it's a pending offline creation
+    if (todo.id < 0) {
+      return 'pending';
+    }
+
+    // Check if currently being modified (mutations in progress)
+    if (deleteTodoMutation.isPending || duplicateTodoMutation.isPending || moveTodoMutation.isPending) {
+      return 'syncing';
+    }
+
+    // If mutations failed
+    if (deleteTodoMutation.isError || duplicateTodoMutation.isError || moveTodoMutation.isError) {
+      return 'failed';
+    }
+
+    // Otherwise, consider it synced (we'll enhance this in Phase 2 with sync queue checking)
+    return null;
+  };
+
+  const syncStatus = getSyncStatus();
+
   return (
     <li
       className={`p-3 ${getPriorityColor(
@@ -152,10 +176,15 @@ function TodoListItem({
       >
         {/*list title, detail, date/time and list name */}
         <div className="flex justify-between items-start">
-          <div className="flex flex-col">
-            <p className={`capitalize font-medium text-card-foreground ${todo.completed ? 'line-through opacity-60' : ''}`}>
-              {todo.title}
-            </p>
+          <div className="flex flex-col flex-1">
+            <div className="flex items-center justify-between gap-2">
+              <p className={`capitalize font-medium text-card-foreground ${todo.completed ? 'line-through opacity-60' : ''}`}>
+                {todo.title}
+              </p>
+              {syncStatus && (
+                <SyncBadge status={syncStatus} className="shrink-0" />
+              )}
+            </div>
             {todo.detail && (
               <p className={`text-xs text-muted-foreground mt-1 line-clamp-2 ${todo.completed ? 'line-through opacity-60' : ''}`}>
                 {todo.detail}

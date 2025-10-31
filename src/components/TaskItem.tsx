@@ -36,6 +36,7 @@ import {
   EmptyDescription,
   EmptyContent,
 } from "@/components/ui/empty";
+import { SyncBadge, SyncBadgeStatus } from "@/components/SyncBadge";
 
 export type MockState = "loading" | "error" | "empty" | "content" | null;
 
@@ -186,6 +187,7 @@ export const TaskItem = ({
     if (!title.trim()) return;
 
     setIsSaving(true);
+    console.log('[TaskItem] Starting to save todo...');
     try {
       const todoData: CreateTodoData = {
         title: title.trim(),
@@ -203,15 +205,27 @@ export const TaskItem = ({
 
       if (isEditMode && todo) {
         // Update existing todo
+        console.log('[TaskItem] Updating existing todo:', todo.id);
         savedTodo = await updateTodo(todo.id, todoData);
         toast.success("Task updated successfully");
       } else {
         // Create new todo
+        console.log('[TaskItem] Creating new todo...');
         savedTodo = await createTodo(todoData);
+        console.log('[TaskItem] Todo created:', savedTodo);
         toast.success("Task created successfully");
+
+        // For offline-created todos (negative ID), manually update cache for instant UI update
+        if (savedTodo.id < 0) {
+          console.log('[TaskItem] Manually updating cache for offline todo');
+          queryClient.setQueryData<Todo[]>(["todos"], (oldTodos = []) => {
+            return [savedTodo, ...oldTodos];
+          });
+        }
       }
 
-      // Refresh todos
+      // Refresh todos to get latest state
+      console.log('[TaskItem] Invalidating queries...');
       await queryClient.invalidateQueries({ queryKey: ["todos"] });
       await queryClient.invalidateQueries({ queryKey: ["todoLists"] });
 
@@ -222,21 +236,38 @@ export const TaskItem = ({
       await new Promise((resolve) => setTimeout(resolve, 100));
 
       // Close
+      console.log('[TaskItem] Closing task item');
       onClose?.();
     } catch (error) {
+      console.error('[TaskItem] Error saving todo:', error);
       toast.error(
         `Failed to ${isEditMode ? "update" : "create"} task: ${
           error instanceof Error ? error.message : String(error)
         }`
       );
-      console.error(
-        `Failed to ${isEditMode ? "update" : "create"} task:`,
-        error
-      );
     } finally {
       setIsSaving(false);
+      console.log('[TaskItem] Save process completed');
     }
   };
+
+  // Determine sync status for this task
+  const getSyncStatus = (): SyncBadgeStatus | null => {
+    // If task is being saved
+    if (isSaving) {
+      return 'syncing';
+    }
+
+    // If in edit mode and todo has negative ID, it's pending sync
+    if (isEditMode && todo && todo.id < 0) {
+      return 'pending';
+    }
+
+    // Otherwise, no sync indicator needed
+    return null;
+  };
+
+  const syncStatus = getSyncStatus();
 
   // Mock state rendering
   const showLoading = mockState === "loading";
@@ -300,7 +331,7 @@ export const TaskItem = ({
   return (
     <div className=" text-muted-foreground">
       {/* Title */}
-      <div className="">
+      <div className="relative">
         <Input
           ref={titleInputRef}
           type="text"
@@ -312,6 +343,12 @@ export const TaskItem = ({
             title.trim() ? "text-primary" : "text-muted-foreground"
           }`}
         />
+        {/* Sync Status Badge */}
+        {syncStatus && (
+          <div className="absolute top-2 right-2">
+            <SyncBadge status={syncStatus} />
+          </div>
+        )}
       </div>
 
       <div className="md:ml-10 ml-2 flex flex-col gap-4 md:gap-6">

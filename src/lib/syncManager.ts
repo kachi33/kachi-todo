@@ -1,4 +1,4 @@
-import { Todo, TodoList, CreateTodoData } from '@/types';
+import { Todo, TodoList, CreateTodoData, SyncHistoryItem } from '@/types';
 import { offlineStorage } from './offlineStorage';
 import { ensureSession } from './session';
 
@@ -70,12 +70,22 @@ class SyncManager {
     this.syncListeners.forEach(callback => callback());
   }
 
+  private emitEvent(eventName: string, data?: any) {
+    if (typeof window !== 'undefined') {
+      const event = new CustomEvent(eventName, { detail: data });
+      window.dispatchEvent(event);
+    }
+  }
+
   async triggerSync(): Promise<SyncResult> {
     if (!this.isOnline || this.syncInProgress) {
       return { success: false, conflicts: [], errors: ['Offline or sync in progress'] };
     }
 
     this.syncInProgress = true;
+    this.emitEvent('sync:start');
+
+    const syncStartTime = Date.now();
     const result: SyncResult = {
       success: true,
       conflicts: [],
@@ -92,11 +102,39 @@ class SyncManager {
       // Step 3: Update last sync timestamp
       await offlineStorage.setLastSyncTime(Date.now());
 
+      // Add sync history entry
+      const syncDuration = Date.now() - syncStartTime;
+      await offlineStorage.addSyncHistory({
+        id: `sync-${Date.now()}`,
+        operation: 'sync',
+        status: result.errors.length > 0 ? 'failed' : (result.conflicts.length > 0 ? 'conflict' : 'success'),
+        timestamp: Date.now(),
+        itemType: 'todo',
+        error: result.errors.length > 0 ? result.errors.join(', ') : undefined,
+        duration: syncDuration
+      });
+
       console.log('Sync completed successfully', result);
+      this.emitEvent('sync:complete', result);
+      this.emitEvent('sync:history-updated');
     } catch (error) {
       result.success = false;
       result.errors.push(error instanceof Error ? error.message : 'Unknown sync error');
       console.error('Sync failed:', error);
+
+      // Add failed sync history entry
+      await offlineStorage.addSyncHistory({
+        id: `sync-${Date.now()}`,
+        operation: 'sync',
+        status: 'failed',
+        timestamp: Date.now(),
+        itemType: 'todo',
+        error: error instanceof Error ? error.message : 'Unknown sync error',
+        duration: Date.now() - syncStartTime
+      });
+
+      this.emitEvent('sync:error', error);
+      this.emitEvent('sync:history-updated');
     } finally {
       this.syncInProgress = false;
       this.notifyListeners();
@@ -137,65 +175,149 @@ class SyncManager {
 
   private async pushCreate(item: any) {
     const headers = await this.createAuthHeaders();
+    const startTime = Date.now();
 
-    if (item.table === 'todos') {
-      const response = await fetch(`${BASE_URL}/api/todos`, {
-        method: 'POST',
-        headers,
-        body: JSON.stringify({
-          title: item.data.title,
-          detail: item.data.detail,
-          priority: item.data.priority,
-          due_date: item.data.due_date,
-          due_time: item.data.due_time,
-          list_id: item.data.list_id,
-          completed: item.data.completed
-        }),
+    try {
+      if (item.table === 'todos') {
+        const response = await fetch(`${BASE_URL}/api/todos`, {
+          method: 'POST',
+          headers,
+          body: JSON.stringify({
+            title: item.data.title,
+            detail: item.data.detail,
+            priority: item.data.priority,
+            due_date: item.data.due_date,
+            due_time: item.data.due_time,
+            list_id: item.data.list_id,
+            completed: item.data.completed
+          }),
+        });
+
+        if (!response.ok) throw new Error(`Create failed: ${response.statusText}`);
+
+        const serverTodo = await response.json();
+
+        // Update local record with server ID
+        await offlineStorage.deleteTodo(item.data.id); // Remove temp ID
+        await offlineStorage.saveTodo(serverTodo, false); // Save with server ID
+
+        // Add success history
+        await offlineStorage.addSyncHistory({
+          id: `create-${Date.now()}`,
+          operation: 'create',
+          status: 'success',
+          timestamp: Date.now(),
+          itemType: 'todo',
+          itemId: serverTodo.id,
+          itemTitle: item.data.title,
+          duration: Date.now() - startTime
+        });
+      }
+    } catch (error) {
+      // Add failed history
+      await offlineStorage.addSyncHistory({
+        id: `create-${Date.now()}`,
+        operation: 'create',
+        status: 'failed',
+        timestamp: Date.now(),
+        itemType: 'todo',
+        itemTitle: item.data.title,
+        error: error instanceof Error ? error.message : 'Unknown error',
+        duration: Date.now() - startTime
       });
-
-      if (!response.ok) throw new Error(`Create failed: ${response.statusText}`);
-
-      const serverTodo = await response.json();
-
-      // Update local record with server ID
-      await offlineStorage.deleteTodo(item.data.id); // Remove temp ID
-      await offlineStorage.saveTodo(serverTodo, false); // Save with server ID
+      throw error;
     }
   }
 
   private async pushUpdate(item: any) {
     const headers = await this.createAuthHeaders();
+    const startTime = Date.now();
 
-    if (item.table === 'todos') {
-      const response = await fetch(`${BASE_URL}/api/todos/${item.data.id}`, {
-        method: 'PUT',
-        headers,
-        body: JSON.stringify({
-          title: item.data.title,
-          detail: item.data.detail,
-          priority: item.data.priority,
-          due_date: item.data.due_date,
-          due_time: item.data.due_time,
-          completed: item.data.completed
-        }),
+    try {
+      if (item.table === 'todos') {
+        const response = await fetch(`${BASE_URL}/api/todos/${item.data.id}`, {
+          method: 'PUT',
+          headers,
+          body: JSON.stringify({
+            title: item.data.title,
+            detail: item.data.detail,
+            priority: item.data.priority,
+            due_date: item.data.due_date,
+            due_time: item.data.due_time,
+            completed: item.data.completed
+          }),
+        });
+
+        if (!response.ok) throw new Error(`Update failed: ${response.statusText}`);
+
+        // Add success history
+        await offlineStorage.addSyncHistory({
+          id: `update-${Date.now()}`,
+          operation: 'update',
+          status: 'success',
+          timestamp: Date.now(),
+          itemType: 'todo',
+          itemId: item.data.id,
+          itemTitle: item.data.title,
+          duration: Date.now() - startTime
+        });
+      }
+    } catch (error) {
+      // Add failed history
+      await offlineStorage.addSyncHistory({
+        id: `update-${Date.now()}`,
+        operation: 'update',
+        status: 'failed',
+        timestamp: Date.now(),
+        itemType: 'todo',
+        itemId: item.data.id,
+        itemTitle: item.data.title,
+        error: error instanceof Error ? error.message : 'Unknown error',
+        duration: Date.now() - startTime
       });
-
-      if (!response.ok) throw new Error(`Update failed: ${response.statusText}`);
+      throw error;
     }
   }
 
   private async pushDelete(item: any) {
     const headers = await this.createAuthHeaders();
+    const startTime = Date.now();
 
-    if (item.table === 'todos') {
-      const response = await fetch(`${BASE_URL}/api/todos/${item.data.id}`, {
-        method: 'DELETE',
-        headers,
-      });
+    try {
+      if (item.table === 'todos') {
+        const response = await fetch(`${BASE_URL}/api/todos/${item.data.id}`, {
+          method: 'DELETE',
+          headers,
+        });
 
-      if (!response.ok && response.status !== 404) {
-        throw new Error(`Delete failed: ${response.statusText}`);
+        if (!response.ok && response.status !== 404) {
+          throw new Error(`Delete failed: ${response.statusText}`);
+        }
+
+        // Add success history
+        await offlineStorage.addSyncHistory({
+          id: `delete-${Date.now()}`,
+          operation: 'delete',
+          status: 'success',
+          timestamp: Date.now(),
+          itemType: 'todo',
+          itemId: item.data.id,
+          duration: Date.now() - startTime
+        });
       }
+    } catch (error) {
+      // Add failed history
+      await offlineStorage.addSyncHistory({
+        id: `delete-${Date.now()}`,
+        operation: 'delete',
+        status: 'failed',
+        timestamp: Date.now(),
+        itemType: 'todo',
+        itemId: item.data.id,
+        error: error instanceof Error ? error.message : 'Unknown error',
+        duration: Date.now() - startTime
+      });
+      throw error;
     }
   }
 
@@ -318,6 +440,7 @@ class SyncManager {
   async createTodoOffline(todoData: CreateTodoData): Promise<Todo> {
     // Create temporary negative ID for offline items
     const tempId = -Date.now();
+    console.log('[syncManager] Creating todo offline with temp ID:', tempId);
 
     const offlineTodo: Todo = {
       id: tempId,
@@ -333,10 +456,14 @@ class SyncManager {
     };
 
     await offlineStorage.saveTodo(offlineTodo, true);
+    console.log('[syncManager] Saved todo to offline storage:', offlineTodo);
 
     // Try to sync immediately if online
     if (this.isOnline) {
+      console.log('[syncManager] Triggering sync because isOnline=true');
       this.triggerSync();
+    } else {
+      console.log('[syncManager] Not triggering sync because isOnline=false');
     }
 
     return offlineTodo;
@@ -373,6 +500,10 @@ class SyncManager {
       isOnline: this.isOnline,
       syncInProgress: this.syncInProgress
     };
+  }
+
+  async clearSyncQueue() {
+    return await offlineStorage.clearSyncQueue();
   }
 }
 

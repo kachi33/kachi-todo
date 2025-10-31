@@ -7,6 +7,9 @@ import QueryProvider from '@/providers/QueryProvider'
 import ThemeToggle from '@/components/ThemeToggle'
 import SidebarWrapper from '@/components/SidebarWrapper'
 import { Toaster } from "@/components/ui/sonner"
+import { SyncToastNotifier } from '@/components/SyncToastNotifier'
+import { PWAProvider } from '@/components/PWAProvider'
+import { InstallPrompt } from '@/components/InstallPrompt'
 import { Footer } from 'react-day-picker'
 import Link from 'next/link'
 import { Inter } from 'next/font/google'
@@ -17,6 +20,20 @@ const inter = Inter({ subsets: ['latin'] })
 export const metadata: Metadata = {
   title: "Kachi's ToDo App",
   description: 'A modern, feature-rich todo application with productivity tracking',
+  manifest: '/manifest.json',
+  appleWebApp: {
+    capable: true,
+    statusBarStyle: 'default',
+    title: "Kachi's ToDo",
+  },
+}
+
+export const viewport = {
+  width: 'device-width',
+  initialScale: 1,
+  maximumScale: 1,
+  userScalable: false,
+  themeColor: '#000000',
 }
 
 export default function RootLayout({
@@ -45,10 +62,13 @@ export default function RootLayout({
                 {children}
                 </section>
                 <Footer className="text-center p-4 text-sm text-muted-foreground fixed bottom-0 left-0 right-0 bg-background" >
-                  &copy; {new Date().getFullYear()} Kachi's ToDo App. All rights reserved.
+                  &copy; With ❤️ by Kachi. All rights reserved.
                 </Footer>
               </main>
               <Toaster />
+              <SyncToastNotifier />
+              <PWAProvider />
+              <InstallPrompt />
               <SidebarWrapper />
             </SidebarProvider>
           </ThemeProvider>

@@ -4,6 +4,7 @@ import {
   SheetFooter,
   SheetHeader,
   SheetTitle,
+  SheetDescription,
 } from "@/components/ui/sheet";
 import {
   DropdownMenu,
@@ -94,6 +95,9 @@ export const Sidebar = ({ todo, isOpen, onClose }: SidebarProps) => {
         <SheetHeader className="flex items-start pl-10 pt-6 pb-2">
           <VisuallyHidden>
             <SheetTitle className="">{isEditMode ? "Edit Task" : "Create New Task"}</SheetTitle>
+            <SheetDescription className="">
+              {isEditMode ? "Edit your task details below" : "Create a new task by filling in the details below"}
+            </SheetDescription>
           </VisuallyHidden>
           <div className="flex w-full items-end justify-end">
 

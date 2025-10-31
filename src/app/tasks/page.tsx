@@ -9,14 +9,7 @@ import PaginationControl from "@/components/PaginationControl";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import FilterModal, { FilterOptions } from "@/components/FilterModal";
 import { useSidebar } from "@/contexts/SidebarContext";
-import {
-  Empty,
-  EmptyHeader,
-  EmptyMedia,
-  EmptyTitle,
-  EmptyDescription,
-  EmptyContent,
-} from "@/components/ui/empty";
+import { Empty, EmptyHeader, EmptyMedia, EmptyTitle, EmptyDescription, EmptyContent} from "@/components/ui/empty";
 import {
   ListTodo,
   Plus,
@@ -25,6 +18,7 @@ import {
   AlertCircle,
   RefreshCw,
   X,
+  ChevronDown,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
@@ -34,6 +28,12 @@ import ListCard from "@/components/ListCard";
 import DeleteList from "@/components/DeleteList";
 import { TodoList } from "@/types";
 import DevStateToggler, { MockState } from "@/components/DevStateToggler";
+import {
+  DropdownMenu,
+  DropdownMenuTrigger,
+  DropdownMenuContent,
+  DropdownMenuItem
+} from "@/components/ui/dropdown-menu";
 
 function Tasks(): React.JSX.Element {
   const queryClient = useQueryClient();
@@ -247,7 +247,7 @@ function Tasks(): React.JSX.Element {
     <div className="w-full flex flex-col gap-3 lg:gap-4 p-2 ">
 
       {/* List Cards */}
-      <section className="w-full p-2">
+      <section className="w-full rounded-md p-2">
         <div className="flex items-center gap-4 p-2 overflow-x-auto scrollbar-hide">
           {/* New List Button */}
           <div className="shrink-0">
@@ -304,7 +304,31 @@ function Tasks(): React.JSX.Element {
 
         {/* filters and them */}
         <div className="text-muted-foreground flex items-center justify-between">
-          <div className="flex items-center gap-2">
+                    <div className="flex items-center gap-2">
+
+          <div>
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button variant="ghost" size="sm" className="h-auto px-3 py-1.5">
+                  {filters.status === "all" && "All"}
+                  {filters.status === "pending" && "Pending"}
+                  {filters.status === "completed" && "Completed"}
+                  <ChevronDown className="mr-2 size-4"/>
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent className="min-w-32">
+                <DropdownMenuItem className="" inset={false} onClick={() => setFilters({ ...filters, status: "pending" })}>
+                  Pending
+                </DropdownMenuItem>
+                <DropdownMenuItem className="" inset={false} onClick={() => setFilters({ ...filters, status: "completed" })}>
+                  Completed
+                </DropdownMenuItem>
+                <DropdownMenuItem className="" inset={false} onClick={() => setFilters({ ...filters, status: "all" })}>
+                  All
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
+          </div>
             {/* filter text */}
             {hasActiveFilters && (
               <>
@@ -341,8 +365,9 @@ function Tasks(): React.JSX.Element {
           </div>
         </div>
 
+              {/* Empty State */}
         {(displayIsEmpty || todos.length === 0) ? (
-          <Empty className="from-muted/50 to-background h-full bg-linear-to-b from-30%">
+          <Empty className="from-muted/50 to-background h-full shadow-lg bg-linear-to-b from-30%">
             <EmptyHeader className="">
               <EmptyMedia variant="icon" className="">
                 <ListTodo />
@@ -368,7 +393,7 @@ function Tasks(): React.JSX.Element {
           </Empty>
         ) : (
           <>
-          
+
           {/* Tasks */}
             <ScrollArea className="h-[50vh] p-2 md:px-4">
               <ul className="space-y-2 md:space-y-4">

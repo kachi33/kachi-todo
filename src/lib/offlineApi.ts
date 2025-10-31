@@ -55,16 +55,22 @@ export const fetchTodoById = async (id: string | number): Promise<Todo> => {
 export const createTodo = async (todo: CreateTodoData): Promise<Todo> => {
   if (isOnline()) {
     try {
+      console.log('[offlineApi] Attempting to create todo on server...');
       const serverTodo = await originalApi.createTodo(todo);
       await offlineStorage.saveTodo(serverTodo);
+      console.log('[offlineApi] Successfully created todo on server:', serverTodo.id);
       return serverTodo;
     } catch (error) {
-      console.warn('Failed to create todo on server, creating offline:', error);
+      console.warn('[offlineApi] Failed to create todo on server, creating offline:', error);
     }
+  } else {
+    console.log('[offlineApi] Offline detected, creating todo offline...');
   }
 
   // Create offline
-  return await syncManager.createTodoOffline(todo);
+  const offlineTodo = await syncManager.createTodoOffline(todo);
+  console.log('[offlineApi] Successfully created todo offline:', offlineTodo.id);
+  return offlineTodo;
 };
 
 export const updateTodo = async (id: number, todo: Partial<CreateTodoData>): Promise<Todo> => {
