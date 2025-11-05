@@ -83,6 +83,8 @@ const nextConfig = {
   experimental: {
     optimizePackageImports: ['lucide-react', '@radix-ui/react-dialog']
   },
+  // Keep Prisma external for proper binary handling in serverless
+  serverExternalPackages: ['@prisma/client', 'prisma'],
   // Allow environment variables to be accessed
   env: {
     NEXT_PUBLIC_API_BASE_URL: process.env.NEXT_PUBLIC_API_BASE_URL || ''
