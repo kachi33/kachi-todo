@@ -29,6 +29,7 @@ export default function DeleteList({ list, open, onOpenChange }: DeleteListProps
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["todoLists"] });
       queryClient.invalidateQueries({ queryKey: ["todos"] });
+      queryClient.invalidateQueries({ queryKey: ["userStats"] });
       toast.success("List deleted successfully!");
       onOpenChange(false);
     },

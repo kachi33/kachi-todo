@@ -76,7 +76,7 @@ const QuotesCard = () => {
           <Quote className="h-12 w-12 text-muted-foreground/30 mb-4" />
         </div>
 
-        <p className={`text-2xl font-serif font-medium text-foreground mb-4 transition-opacity duration-300 ${
+        <p className={`text-2xl text-center font-serif font-medium text-foreground mb-4 transition-opacity duration-300 ${
           isRefreshing ? 'opacity-0' : 'opacity-100'
         }`}>
           {currentQuote.text}

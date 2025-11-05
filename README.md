@@ -2,73 +2,45 @@
 
 A modern, full-featured Todo List application built with **Next.js 16**, **TypeScript**, **PostgreSQL**, and **Prisma**. Features include todo lists, task management, filtering, dark mode, offline support, and productivity tracking.
 
-## Live Demo
+
 
 [Kachi-todo-app](https://kachi-todo.pipeops.net//)
 
-##  Features
+![Tasq](./docs/screenshots/tasq-screenshot.png)
 
-### Core Features
-- ** Task Management** - Create, edit, delete, and organize todos
-- ** Custom Lists** - Organize todos into custom lists with color coding
-- ** Priority Levels** - Set task priorities (urgent, high, medium, low)
-- ** Due Dates & Times** - Schedule tasks with specific dates and times
-- ** Task Completion** - Mark tasks as complete/incomplete
-- ** Advanced Filtering** - Filter by priority, status, and list
-- ** Pagination** - Clean pagination for large task lists
+## Key Features Explained
 
-### UI/UX Features
-- ** Dark Mode** - Toggle between light and dark themes
-- ** Responsive Design** - Optimized for all screen sizes
-- ** Fast & Smooth** - Built with Next.js for optimal performance
-- ** Modern UI** - Beautiful interface using Tailwind CSS and ShadCN UI
-- ** Offline Support** - PWA with offline capabilities
-- ** Optimistic Updates** - Instant UI feedback using TanStack Query
+### Session-Based Isolation
+Each user gets a unique session ID stored in localStorage, ensuring their todos remain private without requiring authentication.
 
-### Productivity Features
-- ** Productivity Stats** - Track completed vs pending tasks
-- ** Weekly Overview** - Visual progress tracking
-- ** Upcoming Tasks** - Dashboard view of tasks due soon
-- ** Overdue Tracking** - Identify overdue tasks
-- ** Motivational Quotes** - Inspiring quotes on the dashboard
+### Offline Support
+The app includes a service worker and offline API fallback to ensure functionality even without an internet connection.
 
-### Technical Features
-- ** Session Management** - Session-based task isolation
-- ** PostgreSQL Database** - Reliable data persistence with Prisma ORM
-- ** Server-Side Rendering** - Fast initial page loads with Next.js
-- ** Accessible** - WCAG compliant components
-- ** Error Boundaries** - Graceful error handling with retry capabilities
+### Optimistic Updates
+Using TanStack Query's optimistic update pattern, UI changes appear instantly before server confirmation, with automatic rollback on errors.
 
-##  Tech Stack
+### Smart Filtering
+Filter todos by:
+- **Priority**: urgent, high, medium, low
+- **Status**: all, completed, pending
+- **List**: filter by specific todo list
 
-### Frontend
-- **Next.js 16** - React framework with App Router
-- **React 19** - Latest React with modern features
-- **TypeScript** - Full type safety
-- **Tailwind CSS 4** - Utility-first styling
-- **ShadCN UI** - Accessible component library
-- **Lucide React** - Beautiful icon library
-- **Swiper** - Touch slider for carousels
+### Dark Mode
+Seamless dark mode toggle using next-themes with system preference detection and persistent user preference.
 
-### Backend & Database
-- **PostgreSQL** - Production-ready relational database
-- **Prisma** - Type-safe ORM for database access
-- **Next.js API Routes** - Serverless API endpoints
+## Project Architecture
 
-### State Management & Data Fetching
-- **TanStack Query v5** - Server state management
-- **React Context** - Client-side state (theme, sidebar)
-- **Optimistic Updates** - Instant UI feedback
+For detailed information about the project structure, component organization, and data flow, see [ARCHITECTURE.md](./ARCHITECTURE.md).
 
-### Additional Libraries
-- **next-pwa** - Progressive Web App support
-- **next-themes** - Theme management
-- **date-fns** - Date manipulation
-- **axios** - HTTP client
-- **sonner** - Toast notifications
-- **react-day-picker** - Date picker component
+**Quick Overview:**
+- **Frontend**: Next.js 16 with App Router, React Server Components
+- **State Management**: TanStack Query for server state, React Context for UI state
+- **Database**: PostgreSQL with Prisma ORM
+- **Offline Support**: Service Worker with IndexedDB fallback
+- **Styling**: Tailwind CSS 4 with ShadCN UI components
 
-##  Installation & Setup
+
+## Installation & Setup
 
 ### Prerequisites
 - Node.js 18+ installed
@@ -95,12 +67,6 @@ Create a `.env` file in the root directory:
 ```env
 # Database
 DATABASE_URL="postgresql://USER:PASSWORD@HOST:PORT/DATABASE?schema=public"
-
-# Example for local PostgreSQL:
-# DATABASE_URL="postgresql://postgres:password@localhost:5432/kachi_todo?schema=public"
-
-# Example for Render PostgreSQL:
-# DATABASE_URL="postgresql://user:password@dpg-xxx.oregon-postgres.render.com/database_name"
 ```
 
 ### 4. Database Setup
@@ -126,130 +92,41 @@ npm run dev
 
 Open [http://localhost:3000](http://localhost:3000) in your browser.
 
-##  Build & Deploy
+## Future Improvements
 
-### Build for Production
+-  User registration and login
+-  Multi-device sync
+-  Task categories and tags
+-  File attachments
+-  Task sharing and collaboration
+-  Calendar view
+-  Kanban board view
+-  Productivity trends and insights
+-  Internationalization (i18n)
+-  Email and push notifications
 
-```bash
-npm run build
-```
-
-### Start Production Server
-
-```bash
-npm start
-```
-
-### Type Checking
-
-```bash
-npm run type-check
-```
-
-### Linting
-
-```bash
-npm run lint
-```
-
-
-##  Key Features Explained
-
-### Session-Based Isolation
-Each user gets a unique session ID stored in localStorage, ensuring their todos remain private without requiring authentication.
-
-### Offline Support
-The app includes a service worker and offline API fallback to ensure functionality even without an internet connection.
-
-### Optimistic Updates
-Using TanStack Query's optimistic update pattern, UI changes appear instantly before server confirmation, with automatic rollback on errors.
-
-### Smart Filtering
-Filter todos by:
-- **Priority**: urgent, high, medium, low
-- **Status**: all, completed, pending
-- **List**: filter by specific todo list
-
-### Dark Mode
-Seamless dark mode toggle using next-themes with system preference detection and persistent user preference. 
-
-## Known Issues
-
-- Session-based authentication only (no user accounts yet)
-- No task sharing or collaboration features
-- Limited productivity analytics
-- No task categories or tags beyond lists
-- No recurring tasks support
-
-##  Future Improvements
-
-### Authentication & Users
-- [ ] User registration and login
-- [ ] OAuth integration (Google, GitHub)
-- [ ] Multi-device sync
-- [ ] User profiles
-
-### Features
-- [ ] Task categories and tags
-- [ ] Recurring tasks
-- [ ] Task dependencies
-- [ ] Subtasks/checklists
-- [ ] File attachments
-- [ ] Task comments
-- [ ] Task sharing and collaboration
-- [ ] Calendar view
-- [ ] Kanban board view
-
-### Analytics & Productivity
-- [ ] Advanced analytics dashboard
-- [ ] Productivity trends and insights
-- [ ] Time tracking
-- [ ] Task duration estimates
-- [ ] Focus mode with Pomodoro timer
-
-### Technical
-- [ ] Comprehensive testing suite (Jest/Vitest)
-- [ ] E2E testing (Playwright/Cypress)
-- [ ] Performance monitoring
-- [ ] Accessibility audit
-- [ ] Internationalization (i18n)
-- [ ] Email notifications
-- [ ] Push notifications
 
 ## Contributing
 
-Contributions are welcome! To contribute:
+All contributions are Welcome! Whether it's bug fixes, new features, or documentation improvements, your help is appreciated.
 
-1. **Fork the repository**
-2. **Create a feature branch**
-   ```bash
-   git checkout -b feature/your-feature-name
-   ```
-3. **Make your changes** with proper TypeScript typing
-4. **Run checks**
-   ```bash
-   npm run type-check
-   npm run lint
-   npm run build
-   ```
-5. **Commit your changes**
-   ```bash
-   git commit -am 'Add new feature: description'
-   ```
-6. **Push to your fork**
-   ```bash
-   git push origin feature/your-feature-name
-   ```
-7. **Create a Pull Request**
+**Quick Start:**
+1. Fork the repository
+2. Create a feature branch (`git checkout -b feature/amazing-feature`)
+3. Make your changes 
+4. Test and build locally
+4. Commit your changes (`git commit -m 'Add amazing feature'`)
+5. Push to the branch (`git push origin feature/amazing-feature`)
+6. Open a Pull Request
+
+**For detailed contribution guidelines, development setup, and code standards, see [CONTRIBUTING.md](./CONTRIBUTING.md).**
 
 ### Development Guidelines
 - Maintain full TypeScript compatibility
-- Follow existing code patterns and conventions
-- Add proper type definitions for all new features
+- Follow existing code patterns
 - Ensure components are accessible (WCAG compliant)
 - Test on multiple screen sizes
-- Include clear comments for complex logic
-- Update documentation for new features
+- Add proper type definitions
 
 ## License
 
@@ -259,15 +136,6 @@ This project is open source and available under the [MIT License](LICENSE).
 
 **Kachi**
 - GitHub: [@kachi33](https://github.com/kachi33)
-
-## Acknowledgments
-
-- [ShadCN UI](https://ui.shadcn.com/) - For the beautiful component library
-- [TanStack Query](https://tanstack.com/query) - For amazing data fetching
-- [Lucide Icons](https://lucide.dev/) - For the icon set
-- [Tailwind CSS](https://tailwindcss.com/) - For the styling framework
-- [Prisma](https://www.prisma.io/) - For the excellent ORM
-
 ---
 
-Built with ❤️ by Kachi 
+Built by Kachi 

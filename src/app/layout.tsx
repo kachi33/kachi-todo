@@ -10,21 +10,23 @@ import { Toaster } from "@/components/ui/sonner"
 import { SyncToastNotifier } from '@/components/SyncToastNotifier'
 import { PWAProvider } from '@/components/PWAProvider'
 import { InstallPrompt } from '@/components/InstallPrompt'
+import { WelcomeModal } from '@/components/WelcomeModal'
+import { KeyboardShortcuts } from '@/components/KeyboardShortcuts'
+import { TasqLogo } from '@/components/TasqLogo'
 import { Footer } from 'react-day-picker'
-import Link from 'next/link'
 import { Inter } from 'next/font/google'
 
 const inter = Inter({ subsets: ['latin'] })
 
 
 export const metadata: Metadata = {
-  title: "Kachi's ToDo App",
-  description: 'A modern, feature-rich todo application with productivity tracking',
+  title: "Tasq - Your Personal Task Manager",
+  description: 'A modern, offline-first personal task manager with smart sync and productivity tracking',
   manifest: '/manifest.json',
   appleWebApp: {
     capable: true,
     statusBarStyle: 'default',
-    title: "Kachi's ToDo",
+    title: "Tasq",
   },
 }
 
@@ -47,13 +49,9 @@ export default function RootLayout({
         <QueryProvider>
           <ThemeProvider>
             <SidebarProvider>
-              <main className="min-h-screen bg-background transition-colors pt-20 md:pt-24 lg:pt-32">
-                <header className="flex justify-between items-center p-4 md:p-6 lg:px-20 lg:py-12 fixed top-0 left-0 right-0 z-50">
-                  <Link href="/">
-                  <h1 className="md:text-2xl font-kaushan text-xl font-bold text-foreground">
-                    Kachi's <span className="text-amber-700 text-3xl">ToDo</span>
-                  </h1>
-                  </Link>
+              <main className="max-h-screen bg-linea  transition-colors pt-20 md:pt-24 ">
+                <header className="flex justify-between items-center p-4 md:p-6 lg:px-20 lg:py-10 fixed top-0 left-0 right-0 z-50">
+                  <TasqLogo />
                   <div className="flex items-center gap-2">
                     <ThemeToggle />
                   </div>
@@ -61,14 +59,17 @@ export default function RootLayout({
                 <section className="flex lg:max-w-2xl mx-auto justify-center items-center gap-2  md:gap-4 pb-20">
                 {children}
                 </section>
-                <Footer className="text-center p-4 text-sm text-muted-foreground fixed bottom-0 left-0 right-0 bg-background" >
+                <Footer className="text-center p-2 text-sm text-primary fixed bottom-0 left-0 right-0 bg-transparent" >
                   &copy; With ❤️ by Kachi. All rights reserved.
                 </Footer>
               </main>
               <Toaster />
               <SyncToastNotifier />
               <PWAProvider />
+              <WelcomeModal />
               <InstallPrompt />
+              {/* <QuickAddButton /> */}
+              <KeyboardShortcuts />
               <SidebarWrapper />
             </SidebarProvider>
           </ThemeProvider>

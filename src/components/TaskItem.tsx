@@ -38,8 +38,6 @@ import {
 } from "@/components/ui/empty";
 import { SyncBadge, SyncBadgeStatus } from "@/components/SyncBadge";
 
-export type MockState = "loading" | "error" | "empty" | "content" | null;
-
 // Utility function to format Date to ISO string (YYYY-MM-DD)
 const formatDateToISO = (date?: Date) =>
   date ? date.toISOString().split("T")[0] : undefined;
@@ -48,14 +46,12 @@ interface TaskItemProps {
   todo: Todo | null;
   onSave?: (todo: Todo) => void;
   onClose?: () => void;
-  mockState?: MockState;
 }
 
 export const TaskItem = ({
   todo,
   onSave,
   onClose,
-  mockState = null,
 }: TaskItemProps) => {
   const queryClient = useQueryClient();
 
@@ -228,6 +224,7 @@ export const TaskItem = ({
       console.log('[TaskItem] Invalidating queries...');
       await queryClient.invalidateQueries({ queryKey: ["todos"] });
       await queryClient.invalidateQueries({ queryKey: ["todoLists"] });
+      await queryClient.invalidateQueries({ queryKey: ["userStats"] });
 
       // Call onSave callback with saved todo
       onSave?.(savedTodo);
@@ -268,65 +265,6 @@ export const TaskItem = ({
   };
 
   const syncStatus = getSyncStatus();
-
-  // Mock state rendering
-  const showLoading = mockState === "loading";
-  const showError = mockState === "error";
-  const showEmpty = mockState === "empty";
-
-  if (showLoading) {
-    return (
-      <div className="space-y-4">
-        <Skeleton className="h-20 w-full" />
-        <div className="space-y-3">
-          <Skeleton className="h-12 w-full" />
-          <Skeleton className="h-12 w-full" />
-          <Skeleton className="h-12 w-full" />
-          <Skeleton className="h-24 w-full" />
-        </div>
-      </div>
-    );
-  }
-
-  if (showError) {
-    return (
-      <div className="flex flex-col items-center justify-center p-8 bg-linear-to-br from-card to-card/80 rounded-2xl border border-destructive/50 h-full min-h-[300px]">
-        <AlertCircle className="h-16 w-16 text-destructive mb-6" />
-        <h3 className="text-2xl font-bold text-foreground mb-2">
-          Failed to Load Task
-        </h3>
-        <p className="text-center text-muted-foreground mb-6 max-w-md">
-          We couldn't retrieve this task. Please check your connection and try
-          again.
-        </p>
-        <Button
-          onClick={() => window.location.reload()}
-          variant="default"
-          size="default"
-          className="flex items-center gap-2"
-        >
-          <RefreshCw className="h-4 w-4" />
-          Retry
-        </Button>
-      </div>
-    );
-  }
-
-  if (showEmpty) {
-    return (
-      <Empty className="from-muted/50 to-background h-full bg-linear-to-b from-30%">
-        <EmptyHeader className="">
-          <EmptyMedia className="" variant="icon">
-            <CircleDot />
-          </EmptyMedia>
-          <EmptyTitle className="">No Task Selected</EmptyTitle>
-          <EmptyDescription className="">
-            Select a task from the list to view details, or create a new one.
-          </EmptyDescription>
-        </EmptyHeader>
-      </Empty>
-    );
-  }
 
   return (
     <div className=" text-muted-foreground">

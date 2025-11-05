@@ -1,7 +1,7 @@
 {
-  "name": "Kachi Todo - Personal Task Manager",
-  "short_name": "Kachi Todo",
-  "description": "A modern todo app with powerful offline sync capabilities. Create, manage, and sync your tasks seamlessly.",
+  "name": "Tasq - Your Personal Task Manager",
+  "short_name": "Tasq",
+  "description": "A modern, offline-first personal task manager with smart sync and productivity tracking",
   "start_url": "/",
   "display": "standalone",
   "background_color": "#ffffff",

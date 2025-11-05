@@ -16,8 +16,6 @@ import { SyncBadge, SyncBadgeStatus } from "@/components/SyncBadge";
 
 function TodoListItem({
   todo,
-  onEdit,
-  onDelete,
 }: TodoListItemProps): React.JSX.Element {
   const { openSidebar } = useSidebar();
   const [dropdownOpen, setDropdownOpen] = useState(false);
@@ -36,6 +34,7 @@ function TodoListItem({
     onSuccess: () => {
       // Invalidate and refetch todos
       queryClient.invalidateQueries({ queryKey: ["todos"] });
+      queryClient.invalidateQueries({ queryKey: ["userStats"] });
       setDropdownOpen(false);
     },
     onError: (error) => {
@@ -43,6 +42,19 @@ function TodoListItem({
       alert("Failed to move todo. Please try again.");
     },
   });
+
+  // Past due dates
+  const isPastDue = todo.due_date && (() => {
+    const dueDateTime = new Date(todo.due_date);
+    if (todo.due_time) {
+      const [hours, minutes] = todo.due_time.split(":");
+      dueDateTime.setHours(parseInt(hours), parseInt(minutes));
+    } else {
+      // No specific time - treat as end of day (23:59:59)
+      dueDateTime.setHours(23, 59, 59, 999);
+    }
+    return dueDateTime < new Date();
+  })();
 
   // Mutation to delete todo
   const deleteTodoMutation = useMutation({
@@ -52,6 +64,7 @@ function TodoListItem({
       // Invalidate and refetch todos
       queryClient.invalidateQueries({ queryKey: ["todos"] });
       queryClient.invalidateQueries({ queryKey: ["todoLists"] });
+      queryClient.invalidateQueries({ queryKey: ["userStats"] });
       setDropdownOpen(false);
     },
     onError: (error) => {
@@ -77,6 +90,7 @@ function TodoListItem({
       // Invalidate and refetch todos
       queryClient.invalidateQueries({ queryKey: ["todos"] });
       queryClient.invalidateQueries({ queryKey: ["todoLists"] });
+      queryClient.invalidateQueries({ queryKey: ["userStats"] });
       setDropdownOpen(false);
     },
     onError: (error) => {
@@ -97,6 +111,7 @@ function TodoListItem({
       // Invalidate and refetch todos
       queryClient.invalidateQueries({ queryKey: ["todos"] });
       queryClient.invalidateQueries({ queryKey: ["todoLists"] });
+      queryClient.invalidateQueries({ queryKey: ["userStats"] });
       setDropdownOpen(false);
     },
     onError: (error) => {
@@ -133,7 +148,6 @@ function TodoListItem({
         return "border-l-grey-500";
     }
   };
-
   // Get the list color for the current todo
   const getListColor = () => {
     if (!todo.list_id) return null;
@@ -168,7 +182,7 @@ function TodoListItem({
     <li
       className={`p-3 ${getPriorityColor(
         todo.priority
-      )} border border-l-4 md:border-l-6 border-border rounded flex bg-card shadow-md hover:bg-accent transition-colors`}
+      )} border border-l-4 md:border-l-6 border-border rounded-lg flex bg-card shadow-md hover:bg-accent transition-colors`}
     >
       <div
         className="w-full flex flex-col space-y-2"
@@ -195,7 +209,7 @@ function TodoListItem({
               {(todo.due_date || todo.due_time) && (
                 <div className="flex items-center gap-4 text-xs text-muted-foreground">
                   <div className="flex items-center gap-1">
-                    <span>{formatDateTime(todo.due_date, todo.due_time)}</span>
+                    <span className={isPastDue ? "text-red-500" : "text-muted-foreground"}>{formatDateTime(todo.due_date, todo.due_time)}</span>
                   </div>
                 </div>
               )}

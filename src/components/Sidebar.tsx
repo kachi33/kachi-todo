@@ -14,16 +14,14 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { VisuallyHidden } from "@/components/ui/visually-hidden";
-import { useState } from "react";
-import { MoreVertical, Trash2, Copy, WifiOff } from "lucide-react";
+import { MoreVertical, Trash2, Copy } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Todo } from "@/types";
-import { TaskItem, MockState } from "@/components/TaskItem";
+import { TaskItem } from "@/components/TaskItem";
 import OfflineStatus from "./OfflineStatus";
 import { deleteTodo, createTodo } from "@/lib/offlineApi";
 import { useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
-import DevStateToggler from "@/components/DevStateToggler";
 
 interface SidebarProps {
   todo: Todo | null;
@@ -34,7 +32,6 @@ interface SidebarProps {
 export const Sidebar = ({ todo, isOpen, onClose }: SidebarProps) => {
   const isEditMode = todo !== null;
   const queryClient = useQueryClient();
-  const [mockState, setMockState] = useState<MockState>(null);
 
   const handleDelete = async () => {
     if (!todo) return;
@@ -50,6 +47,7 @@ export const Sidebar = ({ todo, isOpen, onClose }: SidebarProps) => {
       // Invalidate queries to refresh the list
       await queryClient.invalidateQueries({ queryKey: ["todos"] });
       await queryClient.invalidateQueries({ queryKey: ["todoLists"] });
+      await queryClient.invalidateQueries({ queryKey: ["userStats"] });
 
       // Close the sidebar
       onClose();
@@ -77,6 +75,7 @@ export const Sidebar = ({ todo, isOpen, onClose }: SidebarProps) => {
       // Invalidate queries to refresh the list
       await queryClient.invalidateQueries({ queryKey: ["todos"] });
       await queryClient.invalidateQueries({ queryKey: ["todoLists"] });
+      await queryClient.invalidateQueries({ queryKey: ["userStats"] });
 
       // Close the sidebar
       onClose();
@@ -136,18 +135,9 @@ export const Sidebar = ({ todo, isOpen, onClose }: SidebarProps) => {
           </div>
         </SheetHeader>
         <div className="flex-1 overflow-y-auto lg:px-6 px-2">
-          <TaskItem todo={todo} onClose={onClose} mockState={mockState} />
+          <TaskItem todo={todo} onClose={onClose} />
         </div>
 
-        {/* Dev State Toggler - positioned inside sidebar */}
-        {process.env.NODE_ENV === "development" && (
-          <div className="absolute bottom-20 right-4 z-50">
-            <DevStateToggler
-              currentState={mockState}
-              onStateChange={setMockState}
-            />
-          </div>
-        )}
         <SheetFooter className="shrink-0 px-6 py-2 border-t flex flex-row items-center justify-between">
           <OfflineStatus />
         </SheetFooter>
