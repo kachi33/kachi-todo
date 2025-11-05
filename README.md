@@ -4,7 +4,7 @@ A modern, full-featured Todo List application built with **Next.js 16**, **TypeS
 
 
 
-[Kachi-todo-app](https://kachi-todo.pipeops.net//)
+[Kachi-todo-app](https://kachi-todo.vercel.app//)
 
 ![Tasq](./docs/screenshots/tasq-screenshot.png)
 
