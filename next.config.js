@@ -85,6 +85,10 @@ const nextConfig = {
   },
   // Keep Prisma external for proper binary handling in serverless
   serverExternalPackages: ['@prisma/client', 'prisma'],
+  // Explicitly include Prisma files in serverless function output
+  outputFileTracingIncludes: {
+    '/api/**/*': ['./node_modules/.prisma/client/**/*']
+  },
   // Allow environment variables to be accessed
   env: {
     NEXT_PUBLIC_API_BASE_URL: process.env.NEXT_PUBLIC_API_BASE_URL || ''
