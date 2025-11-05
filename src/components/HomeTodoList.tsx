@@ -129,6 +129,9 @@ function HomeTodoList(): React.JSX.Element {
       if (todo.due_time) {
         const [hours, minutes] = todo.due_time.split(":");
         dueDateTime.setHours(parseInt(hours), parseInt(minutes));
+      } else {
+        // No specific time - treat as end of day (23:59:59)
+        dueDateTime.setHours(23, 59, 59, 999);
       }
       // Exclude if overdue (past due date)
       if (dueDateTime < now) return false;
@@ -146,10 +149,16 @@ function HomeTodoList(): React.JSX.Element {
       if (a.due_time) {
         const [hours, minutes] = a.due_time.split(":");
         dateA.setHours(parseInt(hours), parseInt(minutes));
+      } else {
+        // No specific time - treat as end of day for consistent sorting
+        dateA.setHours(23, 59, 59, 999);
       }
       if (b.due_time) {
         const [hours, minutes] = b.due_time.split(":");
         dateB.setHours(parseInt(hours), parseInt(minutes));
+      } else {
+        // No specific time - treat as end of day for consistent sorting
+        dateB.setHours(23, 59, 59, 999);
       }
       return dateA.getTime() - dateB.getTime();
     }

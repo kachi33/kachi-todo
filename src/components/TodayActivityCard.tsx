@@ -14,7 +14,7 @@ const TodayActivityCard = ({ stats }: TodayActivityCardProps) => {
 
   // Get dynamic message
   const getMessage = () => {
-    if (created === 0) return "No data yet. Create and complete task for data";
+    if (created === 0) return " Create and complete task to track progress!";
     if (completed === 0) return "Get started on your tasks!";
     if (completed === created) return "All tasks completed! 🎉";
     return "Keep up the momentum!";
@@ -28,24 +28,24 @@ const TodayActivityCard = ({ stats }: TodayActivityCardProps) => {
   };
 
   return (
-    <div className="flex flex-col items-center justify-center py-8 px-4 min-h-[280px]">
+    <div className="flex flex-col items-center space-y-2 max-h-[280px] justify-center">
       {/* Title */}
-      <h3 className="text-lg font-semibold text-foreground mb-6">
+      <h3 className="text- font-s text-foreground ">
         Today's Progress
       </h3>
 
       {/* Stats Display */}
-      <div className="text-center mb-4">
+      <div className="text-center">
         <div className="text-3xl font-bold text-primary mb-2">
-          {completed} of {created} completed
+          {completed} of {created}
         </div>
       </div>
 
       {/* Progress Bar */}
-      <div className="w-full max-w-xs mb-6">
+      <div className="w-full max-w-xs ">
         <div className="h-4 bg-muted rounded-full overflow-hidden">
           <div
-            className={`h-full bg-gradient-to-r ${getProgressColor()} transition-all duration-500 ease-out`}
+            className={`h-full bg-linear-to-r ${getProgressColor()} transition-all duration-500 ease-out`}
             style={{ width: `${percentage}%` }}
           />
         </div>

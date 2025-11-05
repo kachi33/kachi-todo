@@ -168,7 +168,7 @@ export function WelcomeModal() {
   const isLastStep = currentStep === steps.length - 1;
 
   return (
-    <div className="fixed inset-0 bg-black/60 backdrop-blur-sm z-[100] flex items-center justify-center p-4 animate-in fade-in duration-300">
+    <div className="fixed inset-0 bg-black/60 backdrop-blur-sm z-100 flex items-center justify-center p-4 animate-in fade-in duration-300">
       <Card className="w-full max-w-2xl max-h-[90vh] overflow-hidden flex flex-col shadow-2xl">
         {/* Content */}
         <div className="flex-1 overflow-y-auto p-6 sm:p-8">

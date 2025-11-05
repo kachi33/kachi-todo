@@ -13,7 +13,7 @@ const ProgressChart = ({ stats }: ProgressChartProps) => {
   const isEmpty = stats.total_todos === 0;
 
   return (
-    <div className="flex flex-col items-center space-y-2 md:space-y-4 py-8 px-4 min-h-[280px] justify-center">
+    <div className="flex flex-col items-center space-y-2 max-h-[280px] justify-center">
         {/* Completion Progress Bar */}
         <div className="relative w-24 h-24 md:w-32 md:h-32">
           <svg className="w-24 h-24 md:w-32 md:h-32 transform -rotate-360" viewBox="0 0 36 36">
@@ -28,7 +28,7 @@ const ProgressChart = ({ stats }: ProgressChartProps) => {
             />
             {/* Progress circle */}
             <path
-              className={isEmpty ? "stroke-muted-foreground/30" : "stroke-green-500"}
+              className= "stroke-green-500"
               strokeWidth="2"
               strokeLinecap="round"
               fill="none"
@@ -51,7 +51,7 @@ const ProgressChart = ({ stats }: ProgressChartProps) => {
         <div className="text-muted-foreground">Overall Progress</div>
 
         {/* Dynamic message based on state */}
-        <p className="text-center text-muted-foreground max-w-xs mt-2">
+        <p className="text-center text-muted-foreground">
           {isEmpty
             ? "Create your first task to track progress!"
             : "Track your productivity and stay on top of your tasks"}

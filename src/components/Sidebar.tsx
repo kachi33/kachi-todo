@@ -47,6 +47,7 @@ export const Sidebar = ({ todo, isOpen, onClose }: SidebarProps) => {
       // Invalidate queries to refresh the list
       await queryClient.invalidateQueries({ queryKey: ["todos"] });
       await queryClient.invalidateQueries({ queryKey: ["todoLists"] });
+      await queryClient.invalidateQueries({ queryKey: ["userStats"] });
 
       // Close the sidebar
       onClose();
@@ -74,6 +75,7 @@ export const Sidebar = ({ todo, isOpen, onClose }: SidebarProps) => {
       // Invalidate queries to refresh the list
       await queryClient.invalidateQueries({ queryKey: ["todos"] });
       await queryClient.invalidateQueries({ queryKey: ["todoLists"] });
+      await queryClient.invalidateQueries({ queryKey: ["userStats"] });
 
       // Close the sidebar
       onClose();

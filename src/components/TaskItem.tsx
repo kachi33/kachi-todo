@@ -224,6 +224,7 @@ export const TaskItem = ({
       console.log('[TaskItem] Invalidating queries...');
       await queryClient.invalidateQueries({ queryKey: ["todos"] });
       await queryClient.invalidateQueries({ queryKey: ["todoLists"] });
+      await queryClient.invalidateQueries({ queryKey: ["userStats"] });
 
       // Call onSave callback with saved todo
       onSave?.(savedTodo);
