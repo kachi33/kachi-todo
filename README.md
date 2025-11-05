@@ -2,73 +2,121 @@
 
 A modern, full-featured Todo List application built with **Next.js 16**, **TypeScript**, **PostgreSQL**, and **Prisma**. Features include todo lists, task management, filtering, dark mode, offline support, and productivity tracking.
 
+## Table of Contents
+- [Live Demo](#live-demo)
+- [Screenshots](#screenshots)
+- [Features](#features)
+  - [Core Features](#core-features)
+  - [UI/UX Features](#uiux-features)
+  - [Productivity Features](#productivity-features)
+  - [Technical Features](#technical-features)
+- [Tech Stack](#tech-stack)
+  - [Frontend](#frontend)
+  - [Backend & Database](#backend--database)
+  - [State Management & Data Fetching](#state-management--data-fetching)
+  - [Additional Libraries](#additional-libraries)
+- [Installation & Setup](#installation--setup)
+- [Build & Deploy](#build--deploy)
+- [Key Features Explained](#key-features-explained)
+- [Project Architecture](#project-architecture)
+- [Contributing](#contributing)
+- [Known Issues](#known-issues)
+- [Future Improvements](#future-improvements)
+- [License](#license)
+- [Author](#author)
+- [Acknowledgments](#acknowledgments)
+
 ## Live Demo
 
 [Kachi-todo-app](https://kachi-todo.pipeops.net//)
 
-##  Features
+## Screenshots
+
+### Task Creation & Editing
+![Task Creation](./docs/screenshots/task-creation.png)
+*Create and edit tasks with due dates, priorities, and custom lists*
+
+<!-- Placeholder: Add screenshot of task creation/editing modal -->
+
+### Dark Mode
+![Dark Mode](./docs/screenshots/dark-mode.png)
+*Seamless dark mode support across the entire application*
+
+<!-- Placeholder: Add screenshot showing dark mode -->
+
+## Features
 
 ### Core Features
-- ** Task Management** - Create, edit, delete, and organize todos
-- ** Custom Lists** - Organize todos into custom lists with color coding
-- ** Priority Levels** - Set task priorities (urgent, high, medium, low)
-- ** Due Dates & Times** - Schedule tasks with specific dates and times
-- ** Task Completion** - Mark tasks as complete/incomplete
-- ** Advanced Filtering** - Filter by priority, status, and list
-- ** Pagination** - Clean pagination for large task lists
+- **Task Management** - Create, edit, delete, and organize tasks
+- **Custom Lists and Priority Levels** - Organize todos into custom lists while Set task priorities
+- **Advanced Filtering and Pagination.**
+- **Offline Support** - PWA with offline capabilities
 
 ### UI/UX Features
-- ** Dark Mode** - Toggle between light and dark themes
-- ** Responsive Design** - Optimized for all screen sizes
-- ** Fast & Smooth** - Built with Next.js for optimal performance
-- ** Modern UI** - Beautiful interface using Tailwind CSS and ShadCN UI
-- ** Offline Support** - PWA with offline capabilities
-- ** Optimistic Updates** - Instant UI feedback using TanStack Query
+- **Dark Mode** - Toggle between light and dark themes
+- **Responsive Design** - Optimized for all screen sizes
+- **Fast & Smooth** - Built with Next.js for optimal performance
+- **Modern UI** - Beautiful interface using Tailwind CSS and ShadCN UI
+- **Optimistic Updates** - Instant UI feedback using TanStack Query
+- **Interactive Welcome Modal** - Onboarding experience for new users
+- **Real-time Sync Indicators** - Visual feedback for data synchronization
+- **Empty State Handling** - Helpful messages and prompts when no data exists
+- **Loading Skeletons** - Smooth loading states for better UX
 
 ### Productivity Features
-- ** Productivity Stats** - Track completed vs pending tasks
-- ** Weekly Overview** - Visual progress tracking
-- ** Upcoming Tasks** - Dashboard view of tasks due soon
-- ** Overdue Tracking** - Identify overdue tasks
-- ** Motivational Quotes** - Inspiring quotes on the dashboard
+- **Productivity Stats** - Track completed vs pending tasks
+- **Streak Tracking** - Calendar visualization of your task completion streak
+- **Today's Activity** - Monitor tasks created and completed today
+- **Weekly Overview** - Visual progress tracking
+- **Upcoming Tasks** - Dashboard view of tasks due soon
+- **Overdue Tracking** - Identify overdue tasks
+- **Motivational Quotes** - Inspiring quotes on the dashboard
+- **Keyboard Shortcuts** - Power user features for quick navigation
+- **Sync Notifications** - Stay informed about background sync status
 
 ### Technical Features
-- ** Session Management** - Session-based task isolation
-- ** PostgreSQL Database** - Reliable data persistence with Prisma ORM
-- ** Server-Side Rendering** - Fast initial page loads with Next.js
-- ** Accessible** - WCAG compliant components
-- ** Error Boundaries** - Graceful error handling with retry capabilities
+- **Session Management** - Session-based task isolation
+- **PostgreSQL Database** - Reliable data persistence with Prisma ORM
+- **Server-Side Rendering** - Fast initial page loads with Next.js
+- **Accessible** - WCAG compliant components
+- **Error Boundaries** - Graceful error handling with retry capabilities
+- **Background Sync** - Service worker for offline-first architecture
+- **Optimistic UI Updates** - Instant feedback with automatic rollback on errors
 
-##  Tech Stack
+## Tech Stack
 
 ### Frontend
 - **Next.js 16** - React framework with App Router
 - **React 19** - Latest React with modern features
-- **TypeScript** - Full type safety
+- **TypeScript 5.9** - Full type safety
 - **Tailwind CSS 4** - Utility-first styling
-- **ShadCN UI** - Accessible component library
+- **ShadCN UI** - Accessible component library built on Radix UI
 - **Lucide React** - Beautiful icon library
-- **Swiper** - Touch slider for carousels
+- **Swiper** - Touch slider for carousels and statistics
 
 ### Backend & Database
 - **PostgreSQL** - Production-ready relational database
-- **Prisma** - Type-safe ORM for database access
+- **Prisma 6.18** - Type-safe ORM for database access
 - **Next.js API Routes** - Serverless API endpoints
 
 ### State Management & Data Fetching
-- **TanStack Query v5** - Server state management
+- **TanStack Query v5** - Server state management with caching
 - **React Context** - Client-side state (theme, sidebar)
 - **Optimistic Updates** - Instant UI feedback
 
 ### Additional Libraries
-- **next-pwa** - Progressive Web App support
-- **next-themes** - Theme management
-- **date-fns** - Date manipulation
-- **axios** - HTTP client
+- **next-pwa** - Progressive Web App support with offline capabilities
+- **next-themes** - Theme management with system preference detection
+- **date-fns** - Date manipulation and formatting
+- **axios** - HTTP client for API requests
 - **sonner** - Toast notifications
 - **react-day-picker** - Date picker component
+- **embla-carousel-react** - Carousel component for smooth scrolling
+- **class-variance-authority** - Component variant styling
+- **clsx** - Conditional className utility
+- **tailwind-merge** - Tailwind class merging utility
 
-##  Installation & Setup
+## Installation & Setup
 
 ### Prerequisites
 - Node.js 18+ installed
@@ -126,7 +174,7 @@ npm run dev
 
 Open [http://localhost:3000](http://localhost:3000) in your browser.
 
-##  Build & Deploy
+## Build & Deploy
 
 ### Build for Production
 
@@ -153,7 +201,7 @@ npm run lint
 ```
 
 
-##  Key Features Explained
+## Key Features Explained
 
 ### Session-Based Isolation
 Each user gets a unique session ID stored in localStorage, ensuring their todos remain private without requiring authentication.
@@ -171,17 +219,29 @@ Filter todos by:
 - **List**: filter by specific todo list
 
 ### Dark Mode
-Seamless dark mode toggle using next-themes with system preference detection and persistent user preference. 
+Seamless dark mode toggle using next-themes with system preference detection and persistent user preference.
+
+## Project Architecture
+
+For detailed information about the project structure, component organization, and data flow, see [ARCHITECTURE.md](./ARCHITECTURE.md).
+
+**Quick Overview:**
+- **Frontend**: Next.js 16 with App Router, React Server Components
+- **State Management**: TanStack Query for server state, React Context for UI state
+- **Database**: PostgreSQL with Prisma ORM
+- **Offline Support**: Service Worker with IndexedDB fallback
+- **Styling**: Tailwind CSS 4 with ShadCN UI components
 
 ## Known Issues
 
 - Session-based authentication only (no user accounts yet)
 - No task sharing or collaboration features
-- Limited productivity analytics
 - No task categories or tags beyond lists
 - No recurring tasks support
+- HMR/Turbopack cache issues during development (clear .next folder if needed)
+- Weekly productivity tracking requires timestamp feature implementation
 
-##  Future Improvements
+## Future Improvements
 
 ### Authentication & Users
 - [ ] User registration and login
@@ -218,38 +278,24 @@ Seamless dark mode toggle using next-themes with system preference detection and
 
 ## Contributing
 
-Contributions are welcome! To contribute:
+We welcome contributions! Whether it's bug fixes, new features, or documentation improvements, your help is appreciated.
 
-1. **Fork the repository**
-2. **Create a feature branch**
-   ```bash
-   git checkout -b feature/your-feature-name
-   ```
-3. **Make your changes** with proper TypeScript typing
-4. **Run checks**
-   ```bash
-   npm run type-check
-   npm run lint
-   npm run build
-   ```
-5. **Commit your changes**
-   ```bash
-   git commit -am 'Add new feature: description'
-   ```
-6. **Push to your fork**
-   ```bash
-   git push origin feature/your-feature-name
-   ```
-7. **Create a Pull Request**
+**Quick Start:**
+1. Fork the repository
+2. Create a feature branch (`git checkout -b feature/amazing-feature`)
+3. Make your changes
+4. Commit your changes (`git commit -m 'Add amazing feature'`)
+5. Push to the branch (`git push origin feature/amazing-feature`)
+6. Open a Pull Request
+
+**For detailed contribution guidelines, development setup, and code standards, see [CONTRIBUTING.md](./CONTRIBUTING.md).**
 
 ### Development Guidelines
 - Maintain full TypeScript compatibility
-- Follow existing code patterns and conventions
-- Add proper type definitions for all new features
+- Follow existing code patterns
 - Ensure components are accessible (WCAG compliant)
 - Test on multiple screen sizes
-- Include clear comments for complex logic
-- Update documentation for new features
+- Add proper type definitions
 
 ## License
 
@@ -270,4 +316,4 @@ This project is open source and available under the [MIT License](LICENSE).
 
 ---
 
-Built with ❤️ by Kachi 
+Built by Kachi 

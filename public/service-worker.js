@@ -183,7 +183,7 @@ self.addEventListener('push', (event) => {
   };
 
   event.waitUntil(
-    self.registration.showNotification('Kachi Todo', options)
+    self.registration.showNotification('Tasq', options)
   );
 });
 

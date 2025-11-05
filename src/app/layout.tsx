@@ -10,21 +10,24 @@ import { Toaster } from "@/components/ui/sonner"
 import { SyncToastNotifier } from '@/components/SyncToastNotifier'
 import { PWAProvider } from '@/components/PWAProvider'
 import { InstallPrompt } from '@/components/InstallPrompt'
+import { WelcomeModal } from '@/components/WelcomeModal'
+import { QuickAddButton } from '@/components/QuickAddButton'
+import { KeyboardShortcuts } from '@/components/KeyboardShortcuts'
+import { TasqLogo } from '@/components/TasqLogo'
 import { Footer } from 'react-day-picker'
-import Link from 'next/link'
 import { Inter } from 'next/font/google'
 
 const inter = Inter({ subsets: ['latin'] })
 
 
 export const metadata: Metadata = {
-  title: "Kachi's ToDo App",
-  description: 'A modern, feature-rich todo application with productivity tracking',
+  title: "Tasq - Your Task Manager",
+  description: 'A modern, offline-first task manager with smart sync and productivity tracking',
   manifest: '/manifest.json',
   appleWebApp: {
     capable: true,
     statusBarStyle: 'default',
-    title: "Kachi's ToDo",
+    title: "Tasq",
   },
 }
 
@@ -47,13 +50,9 @@ export default function RootLayout({
         <QueryProvider>
           <ThemeProvider>
             <SidebarProvider>
-              <main className="min-h-screen bg-background transition-colors pt-20 md:pt-24 lg:pt-32">
+              <main className="min-h-screen bg-linear-30  transition-colors pt-20 md:pt-24 lg:pt-32">
                 <header className="flex justify-between items-center p-4 md:p-6 lg:px-20 lg:py-12 fixed top-0 left-0 right-0 z-50">
-                  <Link href="/">
-                  <h1 className="md:text-2xl font-kaushan text-xl font-bold text-foreground">
-                    Kachi's <span className="text-amber-700 text-3xl">ToDo</span>
-                  </h1>
-                  </Link>
+                  <TasqLogo />
                   <div className="flex items-center gap-2">
                     <ThemeToggle />
                   </div>
@@ -68,7 +67,10 @@ export default function RootLayout({
               <Toaster />
               <SyncToastNotifier />
               <PWAProvider />
+              <WelcomeModal />
               <InstallPrompt />
+              {/* <QuickAddButton /> */}
+              <KeyboardShortcuts />
               <SidebarWrapper />
             </SidebarProvider>
           </ThemeProvider>

@@ -1,6 +1,8 @@
 "use client";
 
-import { useState, useMemo } from "react";
+import { useState } from "react";
+
+import { useMemo } from "react";
 import TodoListItem from "@/components/TodoListItems";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -27,7 +29,6 @@ import CreateList from "@/components/CreateList";
 import ListCard from "@/components/ListCard";
 import DeleteList from "@/components/DeleteList";
 import { TodoList } from "@/types";
-import DevStateToggler, { MockState } from "@/components/DevStateToggler";
 import {
   DropdownMenu,
   DropdownMenuTrigger,
@@ -38,7 +39,6 @@ import {
 function Tasks(): React.JSX.Element {
   const queryClient = useQueryClient();
   const { openCreateMode } = useSidebar();
-  const [mockState, setMockState] = useState<MockState>(null);
 
   const {
     data: todos = [],
@@ -169,12 +169,7 @@ function Tasks(): React.JSX.Element {
   );
   const totalPages = Math.ceil(filteredTodos.length / todosPerPage);
 
-  // Override states based on mockState
-  const displayIsLoading = mockState === 'loading' ? true : (mockState === null ? isLoading : false);
-  const displayIsError = mockState === 'error' ? true : (mockState === null ? isError : false);
-  const displayIsEmpty = mockState === 'empty' ? true : false;
-
-  if (displayIsLoading)
+  if (isLoading)
     return (
       <div className="w-full flex flex-col gap-4">
         {/* Skeleton for list cards */}
@@ -207,7 +202,7 @@ function Tasks(): React.JSX.Element {
       </div>
     );
 
-  if (displayIsError)
+  if (isError)
     return (
       <div className="w-full flex flex-col gap-4">
         <div className="flex flex-col items-center justify-center p-8 bg-linear-to-br from-card to-card/80 rounded-2xl border border-destructive/50 h-full min-h-[400px]">
@@ -234,12 +229,6 @@ function Tasks(): React.JSX.Element {
             Retry
           </Button>
         </div>
-
-        {/* Dev State Toggler */}
-        <DevStateToggler
-          currentState={mockState}
-          onStateChange={setMockState}
-        />
       </div>
     );
 
@@ -366,7 +355,7 @@ function Tasks(): React.JSX.Element {
         </div>
 
               {/* Empty State */}
-        {(displayIsEmpty || todos.length === 0) ? (
+        {todos.length === 0 ? (
           <Empty className="from-muted/50 to-background h-full shadow-lg bg-linear-to-b from-30%">
             <EmptyHeader className="">
               <EmptyMedia variant="icon" className="">
@@ -430,12 +419,6 @@ function Tasks(): React.JSX.Element {
           onOpenChange={(open) => !open && setDeleteList(null)}
         />
       </section>
-
-      {/* Dev State Toggler - only visible in development */}
-      <DevStateToggler
-        currentState={mockState}
-        onStateChange={setMockState}
-      />
     </div>
   );
 }

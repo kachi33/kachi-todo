@@ -27,19 +27,8 @@ import TodoListItem from "@/components/TodoListItems";
 import OfflineStatus from "./OfflineStatus";
 import { Separator } from "@/components/ui/separator";
 import { Skeleton } from "@/components/ui/skeleton";
-import { useState } from "react";
 
-export type MockState = "loading" | "error" | "empty" | "content" | null;
-
-interface HomeTodoListProps {
-  mockState?: MockState;
-}
-
-function HomeTodoList({
-  mockState = null,
-}: HomeTodoListProps): React.JSX.Element {
-  const [forceLoading, setForceLoading] = useState(false);
-
+function HomeTodoList(): React.JSX.Element {
   const {
     data: todos = [],
     isLoading,
@@ -50,36 +39,9 @@ function HomeTodoList({
     queryFn: () => fetchTodos(),
   });
 
-  // Override states with mockState if provided
-  const showLoading =
-    mockState === "loading"
-      ? true
-      : mockState === null
-      ? isLoading || forceLoading
-      : false;
-  const showError =
-    mockState === "error" ? true : mockState === null ? isError : false;
-  const showEmpty = mockState === "empty" ? true : false;
-  const showContent = mockState === "content" ? true : false;
-
   const { openSidebar, openCreateMode } = useSidebar();
 
-  const getPriorityColor = (priority: string) => {
-    switch (priority) {
-      case "urgent":
-        return "bg-red-100 text-red-800 border-red-200";
-      case "high":
-        return "bg-orange-100 text-orange-800 border-orange-200";
-      case "medium":
-        return "bg-yellow-100 text-yellow-800 border-yellow-200";
-      case "low":
-        return "bg-green-100 text-green-800 border-green-200";
-      default:
-        return "bg-gray-100 text-gray-800 border-gray-200";
-    }
-  };
-
-  if (showLoading) {
+  if (isLoading) {
     return (
       <div className="flex flex-col gap-3 lg:gap-6">
         <div className="flex items-center  justify-between">
@@ -101,7 +63,7 @@ function HomeTodoList({
     );
   }
 
-  if (showError) {
+  if (isError) {
     return (
       <div className="flex flex-col gap-3 lg:gap-6">
         <div className="flex items-center justify-between">
@@ -157,7 +119,7 @@ function HomeTodoList({
 
   // Filter for pending todos and exclude overdue tasks
   const now = new Date();
-  let pendingTodos = todos.filter((todo: Todo) => {
+  const pendingTodos = todos.filter((todo: Todo) => {
     // Only include incomplete tasks
     if (todo.completed) return false;
 
@@ -174,42 +136,6 @@ function HomeTodoList({
 
     return true;
   });
-
-  // Override with mock data if needed
-  if (showEmpty) {
-    pendingTodos = [];
-  } else if (showContent && pendingTodos.length === 0) {
-    // Create mock todos for content state if there are no real todos
-    pendingTodos = [
-      {
-        id: 1,
-        title: "Sample Task 1",
-        detail: "This is a sample task for demonstration",
-        completed: false,
-        priority: "high",
-        due_date: new Date(Date.now() + 86400000).toISOString().split("T")[0],
-        due_time: "10:00",
-        userId: "demo-user",
-      },
-      {
-        id: 2,
-        title: "Sample Task 2",
-        detail: "Another sample task",
-        completed: false,
-        priority: "medium",
-        due_date: new Date(Date.now() + 172800000).toISOString().split("T")[0],
-        userId: "demo-user",
-      },
-      {
-        id: 3,
-        title: "Sample Task 3",
-        detail: "One more sample task",
-        completed: false,
-        priority: "low",
-        userId: "demo-user",
-      },
-    ] as Todo[];
-  }
 
   // Sort by due date: upcoming tasks first, then tasks without dates
   const sortedTodos = [...pendingTodos].sort((a: Todo, b: Todo) => {
